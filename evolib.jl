@@ -34,16 +34,20 @@ length(chromosome::Chromosome) = chromosome.length
 std(chromosome::Chromosome, ind...) = [std(gene) | gene = chromosome[ind...]]
 
 ## POPULATION TYPE ##
-#type Population{T<:Chromosome} <: AbstractPopulation
-type Population{T} <: AbstractPopulation
-    chromosomes::Array{T,2}
+type Population{T<:Chromosome} <: AbstractPopulation
+#type Population{T} <: AbstractPopulation
+    chromosomes::Array
     pop_size::Int64
+    function Population(chromosomes) 
+        new(chromosomes, length(chromosomes))
+    end
 end
 
 # Constructor
 # Doesn't work, complains about input being of Type Array{Any,2} which shouldn't be the case
 #Population{T<:Chromosome}(chromosomes::Array{T}) = Chromosome(chromosomes, length(chromosomes))
 #Population{T}(chromosomes::Array{Any,2}) = Chromosome(chromosomes, length(chromosomes))
+#Population(chromosomes) = Chromosome(chromosomes, length(chromosomes))
 
 # referencing
 ref(population::Population, ind...) = population.chromosomes[ind...]
@@ -67,5 +71,5 @@ end
 
 # Constructor
 # Doesn't work either
-Generations() = Generations([], 0)
-Generations{T}(population::T) = Generations([population], 1)
+#Generations() = Generations([], 0)
+#Generations{T}(population::T) = Generations([population], 1)
