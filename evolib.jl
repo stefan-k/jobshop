@@ -10,7 +10,7 @@ type Gene{T<:Number} <: AbstractGene
 end
 
 # Constructors
-Gene{T<:Number}(gene::T, std::Float64) = Gene(gene, std) # probably not necessary
+#Gene{T<:Number}(gene::T, std::Float64) = Gene(gene, std) # probably not necessary
 Gene{T<:Number}(gene::T) = Gene(gene, 0.5)
 
 # Utility functions
@@ -34,13 +34,16 @@ length(chromosome::Chromosome) = chromosome.length
 std(chromosome::Chromosome, ind...) = [std(gene) | gene = chromosome[ind...]]
 
 ## POPULATION TYPE ##
-type Population{T<:Chromosome} <: AbstractPopulation
-    chromosomes::Array{T,1}
-    size::Uint64
+#type Population{T<:Chromosome} <: AbstractPopulation
+type Population{T} <: AbstractPopulation
+    chromosomes::Array{T,2}
+    pop_size::Int64
 end
 
 # Constructor
-Population{T<:Chromosome}(chromosomes::Array{T,1}) = Chromosome(chromosomes, length(chromosomes))
+# Doesn't work, complains about input being of Type Array{Any,2} which shouldn't be the case
+#Population{T<:Chromosome}(chromosomes::Array{T}) = Chromosome(chromosomes, length(chromosomes))
+#Population{T}(chromosomes::Array{Any,2}) = Chromosome(chromosomes, length(chromosomes))
 
 # referencing
 ref(population::Population, ind...) = population.chromosomes[ind...]
@@ -51,7 +54,18 @@ length(population::Population) = population.size
 
 ## GENERATIONS TYPE ##
 # keeps track of generations
-type Generations{T<:Population} <: AbstractGenerations
+#type Generations{T<:Population} <: AbstractGenerations
+type Generations{T} <: AbstractGenerations
     populations::Array{T}
     generations::Int64
+
+    function push(population::T)
+        append(populations, population)
+        generations+=1
+    end
 end
+
+# Constructor
+# Doesn't work either
+Generations() = Generations([], 0)
+Generations{T}(population::T) = Generations([population], 1)
