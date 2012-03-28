@@ -46,6 +46,15 @@ size(chromosome::Chromosome) = chromosome.length
 length(chromosome::Chromosome) = chromosome.length
 std(chromosome::Chromosome, ind...) = [std(gene) | gene = chromosome[ind...]]
 
+function apply_obj_func(chromosome::Chromosome)
+    chromosome.fitness = chromosome.obj_func(chromosome) # not sure if this works, gotta test
+end
+
+function apply_obj_func(chromosome::Chromosome, obj_func::Function)
+    # untested
+    chromosome.fitness = obj_func(chromosome)
+end
+
 ################################################################################
 ## POPULATION TYPE                                                            ##
 ################################################################################
