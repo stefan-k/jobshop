@@ -1,6 +1,8 @@
 #--- Abstract evolutionary framework:
 # TODO mutation
 # TODO keep only children better than parents
+#      |-> this is actually not a good idea, as this leads to gradient descent!
+#          Therefore you loose variability. 
 load("evolib.jl")
 
 
