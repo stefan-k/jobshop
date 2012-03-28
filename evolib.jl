@@ -17,13 +17,13 @@ Gene{T<:Number}(gene::T) = Gene(gene, 0.5)
 std(gene::Gene) = gene.std
 
 ## CHROMOSOME TYPE ##
-type Chromosome{T<:Gene} <: AbstractChromosome
-    genes::Array{T}
+type Chromosome <: AbstractChromosome
+    genes::Vector
     length::Int64
 end
 
 # Constructor
-Chromosome{T<:Gene}(genes::Array{T}) = Chromosome(genes, length(genes))
+Chromosome(genes) = Chromosome(genes, length(genes))
 
 # referencing
 ref(chromosome::Chromosome, ind...) = chromosome.genes[ind...]
@@ -34,42 +34,49 @@ length(chromosome::Chromosome) = chromosome.length
 std(chromosome::Chromosome, ind...) = [std(gene) | gene = chromosome[ind...]]
 
 ## POPULATION TYPE ##
-type Population{T<:Chromosome} <: AbstractPopulation
-#type Population{T} <: AbstractPopulation
-    chromosomes::Array
+type Population <: AbstractPopulation
+    chromosomes::Vector
     pop_size::Int64
-    function Population(chromosomes) 
+
+    # several chromosomes passed
+    function Population(chromosomes::Vector) 
         new(chromosomes, length(chromosomes))
     end
-end
 
-# Constructor
-# Doesn't work, complains about input being of Type Array{Any,2} which shouldn't be the case
-#Population{T<:Chromosome}(chromosomes::Array{T}) = Chromosome(chromosomes, length(chromosomes))
-#Population{T}(chromosomes::Array{Any,2}) = Chromosome(chromosomes, length(chromosomes))
-#Population(chromosomes) = Chromosome(chromosomes, length(chromosomes))
+    # one chromosome passed
+    function Population(chromosome::Chromosome) 
+        new([chromosome], 1)
+    end
+end
 
 # referencing
 ref(population::Population, ind...) = population.chromosomes[ind...]
 
 # Utility functions
-size(population::Population) = population.size
-length(population::Population) = population.size
+size(population::Population) = population.pop_size
+length(population::Population) = population.pop_size
+
+# Modifiers
+function push(population::Population, chromosome::Chromosome)
+    push(population.chromosomes, copy(chromosome))
+    population.pop_size += 1
+end
 
 ## GENERATIONS TYPE ##
 # keeps track of generations
-#type Generations{T<:Population} <: AbstractGenerations
-type Generations{T} <: AbstractGenerations
-    populations::Array{T}
+type Generations <: AbstractGenerations
+    populations::Array
     generations::Int64
 
-    function push(population::T)
-        append(populations, population)
-        generations+=1
+    function Generations(population)
+        new([population], 1)
     end
 end
 
-# Constructor
-# Doesn't work either
-#Generations() = Generations([], 0)
-#Generations{T}(population::T) = Generations([population], 1)
+# Utility functions
+
+# Modifiers
+function push(generations::Generations, population::Population)
+    push(generations.populations, copy(population))
+    generations.generations += 1
+end
