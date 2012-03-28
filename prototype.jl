@@ -1,21 +1,21 @@
 #--- Abstract evolutionary framework:
 # TODO mutation
 # TODO keep only children better than parents
+load("evolib.jl")
 
 
 # Simple evolutionary algorithm without mutation:
-function evolution(initial_generation,
-                   replicator_function,
-                   fitness_function,  
-	               stopping_criterion)
+function evolution(initial_generation::Function,
+                   replicator_function::Function,
+                   fitness_function::Function,  
+  	               stopping_criterion::Function)
 
-	current_generation = initial_generation #TODO make copy?
+	current_generation = copy(initial_generation) 
 	generation_counter = 0
 
 	print_generation(0,current_generation)
 	
 	while( ! stopping_criterion(current_generation, generation_counter))
-
 
 		# Pair up randomly:
 		shuffle!(current_generation) # in-place shuffle
@@ -45,9 +45,11 @@ end
 #--- Test case: numbers
 
 # Simplest fitness function: return argument itself
-function fitness(x::Int32)
-	return x
-end
+#function fitness(x::Number)
+	#return x
+#end
+# easier way:
+fitness(x::Number) = x
 
 function print_generation(i, specimens)
 	print("Generation $(dec(i,3)): ")
@@ -69,7 +71,7 @@ function combine_integers(parent1::Uint32,parent2::Uint32)
 	child2 = child2 $ mutation_bit
 	child2 = convert(Uint32, child2)
 
-	return [child1, child2]
+	return child1, child2 # return tuple instead of dense array
 end
 
 # Simple stopping criterion:
