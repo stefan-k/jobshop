@@ -28,6 +28,8 @@
 #  * should Vector rather be AbstractArray{T,1} ?
 #  * when adding Chromosome to Population, check that the number of
 #    of genes per chromosome are the same
+#  * It could be that sort doesn't need to be implemented as long as
+#    isless is defined for a certain type -- we should check that
 #  * add more to the todo list
 
 # I have no idea what I'm doing
@@ -57,7 +59,7 @@ type Gene <: AbstractGene
     end
     
     function Gene(gene::Number, std::Float64, upper_limit::Float64, lower_limit::Float64)
-        if lower_limit > upper_limit
+        if lower_limit >= upper_limit
             error("lower_limit must be less than upper_limit")
         end
         new(gene, std, upper_limit, lower_limit)
@@ -67,7 +69,9 @@ end
 # Copy-constructor
 function copy(gene::Gene) 
     Gene(copy(gene.gene), 
-         copy(gene.std))
+         copy(gene.std),
+         copy(gene.upper_limit),
+         copy(gene.lower_limit))
 end
 
 # Utility functions
@@ -94,10 +98,10 @@ type Chromosome <: AbstractChromosome
     obj_func::Function
 
     function Chromosome(genes::Vector{Gene}, obj_func::Function) 
-        new(copy(genes), length(genes), Inf, obj_func)
-        # one word to copy(): In my testing, I used just one gene several times
-        # for the chromosome. If it is a reference, changing one gene changes 
-        # (obviously) all of them. Therefore: copy()
+        new(map(copy, genes), length(genes), Inf, obj_func)
+        # map ensures that each element of the vector is copied,
+        # not just the array itself. copy() would just copy the array
+        # and leaf all references in genes as the are, which is wrong.
 
         # the following might not work... 
         # maybe fitness shouldn't be calculated when created.
@@ -178,11 +182,13 @@ type Population <: AbstractPopulation
     # several chromosomes passed
     function Population(chromosomes::Vector) 
         new(chromosomes, length(chromosomes))
+        # should we copy that too?
     end
 
     # one chromosome passed
     function Population(chromosome::Chromosome) 
         new([chromosome], 1)
+        # should we copy that too?
     end
 end
 
@@ -272,6 +278,7 @@ type Generations <: AbstractGenerations
 end
 
 # Copy-Constructor
+# does this even make sense for Generations?
 function copy(gen::Generations)
     Generations(copy(populations),
                 copy(generations))
@@ -307,4 +314,56 @@ function roulette(pop::Population)
         elem += 1
     end
     error("weird error that should not happen")
+end
+
+# make sure the gene doesn't exceed it's limits
+function assess_limits(g::Gene)
+    # works with NaNs!
+    if g.gene > g.upper_limit
+        g.gene = g.upper_limit
+    elseif g.gene < g.lower_limit
+        g.gene = g.lower_limit
+    end
+end
+
+# mutate a single gene
+function mutate(g::Gene)
+    g.gene += g.std*randn()
+    assess_limits(g)
+end
+
+# mutate a single gene with a predefined standard deviation
+# -> ignores std settings in g.gene
+function mutate(g::Gene, std::Float64)
+    g.gene += std*randn()
+    assess_limits(g)
+end
+
+# mutate a chromosome
+function mutate(chr::Chromosome)
+    for i=1:length(chr)
+        mutate(chr[i])
+    end
+end
+
+# mutate a chromosome with a predefined standard deviation
+# -> ignores std settings in g.gene
+function mutate(chr::Chromosome, std::Float64)
+    for i=1:length(chr)
+        mutate(chr[i], std)
+    end
+end
+
+# mutate a whole population (not sure if anyone will ever need this)
+function mutate(pop::Population)
+    for i=1:length(pop)
+        mutate(pop[i])
+    end
+end
+
+# mutate a whole population with predefined std (not sure if anyone will ever need this)
+function mutate(pop::Population, std::Float64)
+    for i=1:length(pop)
+        mutate(pop[i], std)
+    end
 end
