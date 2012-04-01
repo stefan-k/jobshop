@@ -54,7 +54,7 @@ type Gene <: AbstractGene
 end
 
 # Copy-constructor
-function copy(gene::Genes) 
+function copy(gene::Gene) 
     Gene(copy(gene.gene), 
          copy(gene.std))
 end
@@ -101,15 +101,24 @@ type Chromosome <: AbstractChromosome
         new(copy(genes), length(genes), Inf, (x)->()) # hack, I don't know how to pass
                                                       # a 'None' function
     end
+
+    function Chromosome(genes::Vector{Gene}, fitness::Float64)
+        print("Warning: No objective function passed!\n")
+        new(copy(genes), length(genes), copy(fitness), (x)->())
+    end
+
+    function Chromosome(genes::Vector{Gene}, fitness::Float64, obj_func::Function)
+        new(copy(genes), length(genes), copy(fitness), obj_func)
+    end
+
 end
 
 # Copy-constructor
 function copy(chr::Chromosome)
     # not sure if function has to be copied
     Chromosome(copy(chr.genes), 
-               copy(chr.length), 
-               copy(chr.fitness), 
-               copy(obj_func))
+               copy(chr.fitness),
+               copy(chr.obj_func))
 end
 
 # referencing
@@ -197,9 +206,6 @@ function isless(chr1::Chromosome, chr2::Chromosome)
 end
 
 function sort!(population::Population)
-    # won't work this way! We will need the sort!(::Function,....) 
-    # version which we have to pass a comparison function, so that
-    # sorting is done based on fitness
     sort!(isless, population.chromosomes)
 end
 
