@@ -102,7 +102,7 @@ type Chromosome <: AbstractChromosome
         new(map(copy, genes), length(genes), Inf, obj_func)
         # map ensures that each element of the vector is copied,
         # not just the array itself. copy() would just copy the array
-        # and leaf all references in genes as the are, which is wrong.
+        # and leave all references in genes as the are, which is wrong.
 
         # the following might not work... 
         # maybe fitness shouldn't be calculated when created.
