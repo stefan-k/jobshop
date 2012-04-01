@@ -8,15 +8,16 @@
 # TODO: 
 #  * Create random Gene with constraints
 #  * Create random Chromosome
-#  * properly implement sort!() for the population
+#  * [DONE] properly implement sort!() for the population
 #  * try to get the type constraints to work
 #  * more printing functions (human readable)
 #  * possibility to flag chromosomes as 'bad'
 #  * handling of objective functions
-#  * roulette wheel selection 
+#  * [DONE] roulette wheel selection 
 #    - needs objective function and a working sort
-#  * crossover
-#  * mutation
+#      + Update: why would it need the objective function? What was I thinking?
+#  * [DONE] crossover
+#  * [DONE] mutation
 #  * different selection/competition models 
 #    - replace parents
 #    - in competition with parents
@@ -318,9 +319,7 @@ end
 function roulette(pop::Population)
     sort!(pop)
     f_sum = inv_fitness_sum(pop)
-    println(f_sum)
     idx = rand()*f_sum
-    println(idx)
     x = 0
     elem = 1
     for i=1:length(pop)
@@ -332,6 +331,9 @@ function roulette(pop::Population)
     end
     error("weird error that should not happen. You probably didn't define a fitness.")
 end
+
+# return several indices determined by roulette
+roulette(pop::Population, num::Int64) = [ roulette(pop) | i = 1:num ]
 
 # make sure the gene doesn't exceed it's limits
 function assess_limits(g::Gene)
