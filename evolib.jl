@@ -25,6 +25,7 @@
 #  * design similar to the one shown in prototype.jl
 #    - although in a more general way
 #  * stopping criterion
+#  * should Vector rather be AbstractArray{T,1} ?
 #  * add more to the todo list
 
 # I have no idea what I'm doing
@@ -50,6 +51,12 @@ type Gene <: AbstractGene
     function Gene(gene::Number, std::Float64) 
         new(gene, std)
     end
+end
+
+# Copy-constructor
+function copy(gene::Genes) 
+    Gene(copy(gene.gene), 
+         copy(gene.std))
 end
 
 # Utility functions
@@ -91,8 +98,18 @@ type Chromosome <: AbstractChromosome
 
     function Chromosome(genes::Vector{Gene})
         print("Warning: No objective function passed!\n")
-        new(copy(genes), length(genes), Inf, (x)->(x))
+        new(copy(genes), length(genes), Inf, (x)->()) # hack, I don't know how to pass
+                                                      # a 'None' function
     end
+end
+
+# Copy-constructor
+function copy(chr::Chromosome)
+    # not sure if function has to be copied
+    Chromosome(copy(chr.genes), 
+               copy(chr.length), 
+               copy(chr.fitness), 
+               copy(obj_func))
 end
 
 # referencing
@@ -149,6 +166,12 @@ type Population <: AbstractPopulation
     end
 end
 
+# Copy-constructor
+function copy(pop::Population)
+    Population(copy(chromosomes),
+               copy(pop_size))
+end
+
 # referencing
 ref(population::Population, ind...) = population.chromosomes[ind...]
 
@@ -169,11 +192,15 @@ function push(population::Population, chromosome::Chromosome)
     population.pop_size += 1
 end
 
+function isless(chr1::Chromosome, chr2::Chromosome)
+    return chr1.fitness < chr2.fitness
+end
+
 function sort!(population::Population)
     # won't work this way! We will need the sort!(::Function,....) 
     # version which we have to pass a comparison function, so that
     # sorting is done based on fitness
-    sort!(population.chromosomes)
+    sort!(isless, population.chromosomes)
 end
 
 ################################################################################
@@ -188,6 +215,12 @@ type Generations <: AbstractGenerations
     function Generations(population)
         new([copy(population)], 1)
     end
+end
+
+# Copy-Constructor
+function copy(gen::Generations)
+    Generations(copy(populations),
+                copy(generations))
 end
 
 # referencing
