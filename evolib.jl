@@ -145,6 +145,21 @@ length(chromosome::Chromosome) = chromosome.length
 # print the stds of all genes of a chromosome indicated by a range/index
 std(chromosome::Chromosome, ind...) = [std(gene) | gene = chromosome[ind...]]
 
+# replace Gene of a Chromosome
+function assign(chr::Chromosome, g::Gene, idx::Int64)
+    chr.genes[idx] = copy(g)
+end
+
+# replace Genes of a Chromosome
+function assign(chr::Chromosome, gs::Vector{Gene}, idx::Range1{Int64})
+    chr.genes[idx] = map(copy, gs)
+end
+
+# replace Genes of a Chromosome
+function assign(chr::Chromosome, gs::Vector{Gene}, idx::Vector{Int64})
+    chr.genes[idx] = map(copy, gs)
+end
+
 # apply the objective function defined in the Chromosome type
 function apply_obj_func(chromosome::Chromosome)
     chromosome.fitness = chromosome.obj_func(chromosome) # not sure if this works, gotta test
@@ -303,7 +318,9 @@ end
 function roulette(pop::Population)
     sort!(pop)
     f_sum = inv_fitness_sum(pop)
+    println(f_sum)
     idx = rand()*f_sum
+    println(idx)
     x = 0
     elem = 1
     for i=1:length(pop)
@@ -313,7 +330,7 @@ function roulette(pop::Population)
         end
         elem += 1
     end
-    error("weird error that should not happen")
+    error("weird error that should not happen. You probably didn't define a fitness.")
 end
 
 # make sure the gene doesn't exceed it's limits
@@ -367,3 +384,21 @@ function mutate(pop::Population, std::Float64)
         mutate(pop[i], std)
     end
 end
+
+function crossover(chr1::Chromosome, chr2::Chromosome, slices::Int64)
+    @assert length(chr1) == length(chr2)
+    # weird, even works when rand produces 0
+    idx = sort([1, int64(round(length(chr1) * rand(slices))), length(chr1)+1])
+    println(idx)
+    tmp = copy(chr1)
+    for i=1:length(idx)-1
+        if i%2 == 0
+            range = [idx[i]:idx[i+1]-1]
+            println(range)
+            chr1[range] = map(copy, chr2[range])
+            chr2[range] = map(copy, tmp[range])
+        end
+    end
+end
+
+crossover(chr1::Chromosome, chr2::Chromosome) = crossover(chr1, chr2, 2)
