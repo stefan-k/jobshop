@@ -197,6 +197,15 @@ ref(population::Population, ind...) = population.chromosomes[ind...]
 size(population::Population) = population.pop_size
 length(population::Population) = population.pop_size
 
+# sum of the fitness of all chromosomes of a population
+function fitness_sum(population::Population) 
+    fitness_sum = 0
+    for i=1:population
+        fitness_sum += population[i].fitness
+    end
+    return fitness_sum
+end
+
 function print_population(population::Population)
     for i=1:length(population)
         tmp = population[i]
