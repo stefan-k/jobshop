@@ -88,6 +88,11 @@ type Chromosome <: AbstractChromosome
         # Comments requested ;)
         fitness = obj_func(genes)
     end
+
+    function Chromosome(genes::Vector{Gene})
+        print("Warning: No objective function passed!\n")
+        new(copy(genes), length(genes), Inf, (x)->(x))
+    end
 end
 
 # referencing
