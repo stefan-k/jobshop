@@ -26,6 +26,8 @@
 #    - although in a more general way
 #  * stopping criterion
 #  * should Vector rather be AbstractArray{T,1} ?
+#  * when adding Chromosome to Population, check that the number of
+#    of genes per chromosome are the same
 #  * add more to the todo list
 
 # I have no idea what I'm doing
@@ -200,15 +202,17 @@ length(population::Population) = population.pop_size
 # sum of the fitness of all chromosomes of a population
 function fitness_sum(population::Population) 
     fitness_sum = 0
-    for i=1:population
+    for i=1:length(population)
         fitness_sum += population[i].fitness
     end
     return fitness_sum
 end
 
-function fitness_sum(population::Population) 
+# sum of the inverse of fitness of all chromosomes of a population
+# needed for roulette
+function inv_fitness_sum(population::Population) 
     fitness_sum = 0
-    for i=1:population
+    for i=1:length(population)
         fitness_sum += 1/population[i].fitness
     end
     return fitness_sum
@@ -274,4 +278,15 @@ end
 function roulette(pop::Population)
     sort!(pop)
     f_sum = inv_fitness_sum(pop)
+    idx = rand()*f_sum
+    x = 0
+    elem = 1
+    for i=1:length(pop)
+        x += 1/pop[i].fitness
+        if idx < x
+            return elem
+        end
+        elem += 1
+    end
+    error("weird error that should not happen")
 end
