@@ -38,13 +38,18 @@ abstract AbstractGenerations <: AbstractEvolutionary
 ## GENE TYPE                                                                  ##
 ################################################################################
 
-type Gene{T<:Number} <: AbstractGene
-    gene::T
+type Gene <: AbstractGene
+    gene::Number
     std::Float64
     # Point to discuss: Should 'factor' be a part of the Gene type?
     # Could be individually adapted, if necessary...
-    Gene{T<:Number}(gene::T) = new(gene, 0.5)
-    Gene{T<:Number}(gene::T, std::Float64) = new(gene, std)
+    function Gene(gene::Number) 
+        new(gene, 0.5)
+    end
+    
+    function Gene(gene::Number, std::Float64) 
+        new(gene, std)
+    end
 end
 
 # Utility functions
