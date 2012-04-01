@@ -389,12 +389,10 @@ function crossover(chr1::Chromosome, chr2::Chromosome, slices::Int64)
     @assert length(chr1) == length(chr2)
     # weird, even works when rand produces 0
     idx = sort([1, int64(round(length(chr1) * rand(slices))), length(chr1)+1])
-    println(idx)
     tmp = copy(chr1)
     for i=1:length(idx)-1
         if i%2 == 0
             range = [idx[i]:idx[i+1]-1]
-            println(range)
             chr1[range] = map(copy, chr2[range])
             chr2[range] = map(copy, tmp[range])
         end
