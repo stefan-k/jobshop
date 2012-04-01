@@ -42,14 +42,23 @@ abstract AbstractGenerations <: AbstractEvolutionary
 type Gene <: AbstractGene
     gene::Number
     std::Float64
+    upper_limit::Float64
+    lower_limit::Float64
     # Point to discuss: Should 'factor' be a part of the Gene type?
     # Could be individually adapted, if necessary...
     function Gene(gene::Number) 
-        new(gene, 0.5)
+        new(gene, 0.5, NaN, NaN)
     end
     
     function Gene(gene::Number, std::Float64) 
-        new(gene, std)
+        new(gene, std, NaN, NaN)
+    end
+    
+    function Gene(gene::Number, std::Float64, upper_limit::Float64, lower_limit::Float64)
+        if lower_limit > upper_limit
+            error("lower_limit must be less than upper_limit")
+        end
+        new(gene, std, upper_limit, lower_limit)
     end
 end
 
@@ -239,4 +248,12 @@ get_generations(generations::Generations) = generations.generations
 function push(generations::Generations, population::Population)
     push(generations.populations, copy(population))
     generations.generations += 1
+end
+
+################################################################################
+## FUNCTIONS                                                                  ##
+################################################################################
+
+function roulette(pop::Population)
+    sort!(pop)
 end
