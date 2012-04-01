@@ -206,6 +206,14 @@ function fitness_sum(population::Population)
     return fitness_sum
 end
 
+function fitness_sum(population::Population) 
+    fitness_sum = 0
+    for i=1:population
+        fitness_sum += 1/population[i].fitness
+    end
+    return fitness_sum
+end
+
 function print_population(population::Population)
     for i=1:length(population)
         tmp = population[i]
@@ -265,4 +273,5 @@ end
 
 function roulette(pop::Population)
     sort!(pop)
+    f_sum = inv_fitness_sum(pop)
 end
