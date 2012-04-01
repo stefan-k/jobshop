@@ -235,8 +235,26 @@ function isless(chr1::Chromosome, chr2::Chromosome)
     return chr1.fitness < chr2.fitness
 end
 
+ismore(chr1::Chromosome, chr2::Chromosome) = !isless(chr1, chr2)
+
+# in-place sort
 function sort!(population::Population)
     sort!(isless, population.chromosomes)
+end
+
+# sort
+function sort(population::Population)
+    sort(isless, population.chromosomes)
+end
+
+# in-place reverse sort
+function sortr!(population::Population)
+    sort!(ismore, population.chromosomes)
+end
+
+# reverse sort
+function sortr(population::Population)
+    sort(ismore, population.chromosomes)
 end
 
 ################################################################################
