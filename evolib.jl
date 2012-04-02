@@ -535,6 +535,27 @@ function mutate(pop::Population, std::Float64)
     return popn
 end
 
+# in-place crossover
+function crossover!(chr1::Chromosome, chr2::Chromosome, slices::Int64)
+    @assert length(chr1) == length(chr2)
+    # weird, even works when rand produces 0
+    idx = sort([1, int64(round(length(chr1) * rand(slices))), length(chr1)+1])
+    tmp = copy(chr1)
+    for i=1:length(idx)-1
+        if i%2 == 0
+            range = [idx[i]:idx[i+1]-1]
+            chr1[range] = map(copy, chr2[range])
+            chr2[range] = map(copy, tmp[range])
+        end
+    end
+end
+
+function crossover!(pop::Population, slices::Int64)
+    idx = roulette(pop, 2)
+    crossover!(pop[idx[1]], pop[idx[2]], slices)
+end
+
+# crossover
 function crossover(chr1::Chromosome, chr2::Chromosome, slices::Int64)
     @assert length(chr1) == length(chr2)
     # weird, even works when rand produces 0
