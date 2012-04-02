@@ -92,7 +92,7 @@ end
 # create random Gene
 rand(T::Type{Gene}) = Gene(rand(), rand())
 rand(T::Type{Gene}, std::Float64) = Gene(rand(), std)
-rand(T::Type{Gene}, upper_limit::Float64, lower_limit::Float64) = Gene(rand(), rand(), upper_limit, lower_limit)
+rand(T::Type{Gene}, upper_limit::Float64, lower_limit::Float64) = Gene(rand()*(upper_limit-lower_limit)+lower_limit, rand(), upper_limit, lower_limit)
 # create value in the given limit
 rand(T::Type{Gene}, std::Float64, upper_limit::Float64, lower_limit::Float64) = Gene(rand()*(upper_limit-lower_limit)+lower_limit, std, upper_limit, lower_limit)
 
@@ -199,15 +199,7 @@ function narrow_std(chromosome::Chromosome, factor::Float64)
     end
 end
 
-rand(T::Type{Chromosome}, num::Int64) = Chromosome([rand(Gene) | i=1:num]) # neat
-rand(T::Type{Chromosome}, num::Int64, obj_func::Function) = Chromosome([rand(Gene) | i=1:num], obj_func) 
-rand(T::Type{Chromosome}, num::Int64, std::Float64) = Chromosome([rand(Gene, std) | i=1:num])
-rand(T::Type{Chromosome}, num::Int64, std::Float64, obj_func::Function) = Chromosome([rand(Gene, std) | i=1:num], obj_func)
-rand(T::Type{Chromosome}, num::Int64, upper_limit::Float64, lower_limit::Float64) = Chromosome([rand(Gene, upper_limit, lower_limit) | i=1:num])
-rand(T::Type{Chromosome}, num::Int64, upper_limit::Float64, lower_limit::Float64, obj_func::Function) = Chromosome([rand(Gene, upper_limit, lower_limit) | i=1:num], obj_func)
-rand(T::Type{Chromosome}, num::Int64, std::Float64, upper_limit::Float64, lower_limit::Float64) = Chromosome([rand(Gene, std, upper_limit, lower_limit) | i=1:num])
-rand(T::Type{Chromosome}, num::Int64, std::Float64, upper_limit::Float64, lower_limit::Float64, obj_func::Function) = Chromosome([rand(Gene, std, upper_limit, lower_limit) | i=1:num], obj_func)
-
+rand(T::Type{Chromosome}, num::Int64, x...) = Chromosome([rand(Gene, x...) | i=1:num]) # neat
 
 ################################################################################
 ## POPULATION TYPE                                                            ##
@@ -300,6 +292,9 @@ end
 function sortr(population::Population)
     sort(ismore, population.chromosomes)
 end
+
+# well, that one was easy.
+rand(T::Type{Population}, chr_num::Int64, gene_num::Int64, x...) = Population([rand(Chromosome, gene_num, x...) | i = 1:chr_num])
 
 ################################################################################
 ## GENERATIONS TYPE                                                           ##
@@ -473,7 +468,7 @@ end
 
 function crossover(pop::Population, slices::Int64)
     idx = roulette(pop, 2)
-    crossover(pop[idx[1]], pop[idx[2]], slices)
+    return crossover(pop[idx[1]], pop[idx[2]], slices)
 end
 
 crossover(chr1::Chromosome, chr2::Chromosome) = crossover(chr1, chr2, 2)
