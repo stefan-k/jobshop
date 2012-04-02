@@ -88,6 +88,16 @@ function narrow_std(gene::Gene, factor::Float64)
     gene.std /= factor
 end
 
+# create random Gene
+rand(T::Type{Gene}) = Gene(rand(), rand())
+rand(T::Type{Gene}, std::Float64) = Gene(rand(), std)
+rand(T::Type{Gene}, upper_limit::Float64, lower_limit::Float64) = Gene(rand(), rand(), upper_limit, lower_limit)
+function rand(T::Type{Gene}, std::Float64, upper_limit::Float64, lower_limit::Float64) 
+    # creates values in the given limit
+    val = rand()*(upper_limit-lower_limit)+lower_limit
+    Gene(val, std, upper_limit, lower_limit)
+end
+
 ################################################################################
 ## CHROMOSOME TYPE                                                            ##
 ################################################################################
