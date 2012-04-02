@@ -145,6 +145,10 @@ type Chromosome <: AbstractChromosome
         new(copy(genes), length(genes), copy(fitness), obj_func)
     end
 
+    function Chromosomes()
+        print("Warning: No objective function passed!\n")
+        new(Genes[], 0, Inf, (x)->())
+    end
 end
 
 # Copy-constructor
@@ -178,6 +182,14 @@ end
 function assign(chr::Chromosome, gs::Vector{Gene}, idx::Vector{Int64})
     chr.genes[idx] = map(copy, gs)
 end
+
+# push gene onto the chromosome
+function push(chr::Chromosome, g::Gene)
+    push(chr.genes, copy(g))
+    chr.length += 1
+end
+
+(+)(chr::Chromosome, g::Gene) = push(chr, g)
 
 # apply the objective function defined in the Chromosome type
 function apply_obj_func(chromosome::Chromosome)
@@ -436,45 +448,91 @@ function assess_limits(g::Gene)
 end
 
 # mutate a single gene
-function mutate(g::Gene)
+function mutate!(g::Gene)
     g.gene += g.std*randn()
     assess_limits(g)
 end
 
+function mutate(g::Gene)
+    gn = copy(g)
+    gn.gene += gn.std*randn()
+    assess_limits(gn)
+    return gn
+end
+
 # mutate a single gene with a predefined standard deviation
 # -> ignores std settings in g.gene
-function mutate(g::Gene, std::Float64)
+function mutate!(g::Gene, std::Float64)
     g.gene += std*randn()
     assess_limits(g)
 end
 
+function mutate(g::Gene, std::Float64)
+    gn = copy(g)
+    gn.gene += std*randn()
+    assess_limits(gn)
+    return gn
+end
+
 # mutate a chromosome
-function mutate(chr::Chromosome)
+function mutate!(chr::Chromosome)
     for i=1:length(chr)
-        mutate(chr[i])
+        mutate!(chr[i])
     end
+end
+
+function mutate(chr::Chromosome)
+    chrn = Chromosome()
+    for i=1:length(chr)
+        chrn + mutate(chr[i])
+    end
+    return chrn
 end
 
 # mutate a chromosome with a predefined standard deviation
 # -> ignores std settings in g.gene
-function mutate(chr::Chromosome, std::Float64)
+function mutate!(chr::Chromosome, std::Float64)
     for i=1:length(chr)
-        mutate(chr[i], std)
+        mutate!(chr[i], std)
     end
+end
+
+function mutate(chr::Chromosome, std::Float64)
+    chrn = Chromosome()
+    for i=1:length(chr)
+        chrn + mutate(chr[i], std)
+    end
+    return chrn
 end
 
 # mutate a whole population (not sure if anyone will ever need this)
-function mutate(pop::Population)
+function mutate!(pop::Population)
     for i=1:length(pop)
-        mutate(pop[i])
+        mutate!(pop[i])
     end
 end
 
-# mutate a whole population with predefined std (not sure if anyone will ever need this)
-function mutate(pop::Population, std::Float64)
+function mutate(pop::Population)
+    popn = Population()
     for i=1:length(pop)
-        mutate(pop[i], std)
+        popn + mutate(pop[i])
     end
+    return popn
+end
+
+# mutate a whole population with predefined std (not sure if anyone will ever need this)
+function mutate!(pop::Population, std::Float64)
+    for i=1:length(pop)
+        mutate!(pop[i], std)
+    end
+end
+
+function mutate(pop::Population, std::Float64)
+    popn = Population()
+    for i=1:length(pop)
+        popn + mutate(pop[i], std)
+    end
+    return popn
 end
 
 function crossover(chr1::Chromosome, chr2::Chromosome, slices::Int64)
@@ -506,6 +564,8 @@ crossover(chr1::Chromosome, chr2::Chromosome) = crossover(chr1, chr2, 2)
 ################################################################################
 
 function genetic(pop::Population, probabilities::GeneticProbabilities)
+    operation = roulette(probabilities)
+    #if operation == Mutation
 
 end
 
