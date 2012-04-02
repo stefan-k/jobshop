@@ -40,6 +40,12 @@ abstract AbstractChromosome           <: AbstractEvolutionary
 abstract AbstractPopulation           <: AbstractEvolutionary
 abstract AbstractGenerations          <: AbstractEvolutionary
 abstract AbstractGeneticProbabilities <: AbstractEvolutionary
+abstract AbstractGeneticOperation     <: AbstractEvolutionary
+
+abstract Recombination <: AbstractGeneticOperation
+abstract Mutation      <: AbstractGeneticOperation
+abstract Reproduction  <: AbstractGeneticOperation
+abstract Immigration   <: AbstractGeneticOperation
 
 ################################################################################
 ## GENE TYPE                                                                  ##
@@ -221,6 +227,7 @@ type Population <: AbstractPopulation
         # should we copy that too?
     end
 
+    # empty Population
     function Population()
         new(Chromosome[], 0)
     end
@@ -402,7 +409,21 @@ function roulette(p::Vector{Float64})
     error("dafuq?")
 end
 
-roulette(gp::GeneticProbabilities) = roulette(get_vector(gp))
+# roulette wheel selection on GeneticProbabilities
+function roulette(gp::GeneticProbabilities) 
+    idx = roulette(get_vector(gp))
+    if idx == 1
+        return Mutation
+    elseif idx == 2
+        return Recombination
+    elseif idx == 3
+        return Reproduction
+    elseif idx == 4
+        return Immigration
+    else
+        error("Error: Impossible Error.")
+    end
+end
 
 # make sure the gene doesn't exceed it's limits
 function assess_limits(g::Gene)
@@ -485,5 +506,6 @@ crossover(chr1::Chromosome, chr2::Chromosome) = crossover(chr1, chr2, 2)
 ################################################################################
 
 function genetic(pop::Population, probabilities::GeneticProbabilities)
+
 end
 
