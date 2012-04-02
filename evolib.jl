@@ -220,6 +220,10 @@ type Population <: AbstractPopulation
         new([chromosome], 1)
         # should we copy that too?
     end
+
+    function Population()
+        new(Chromosome[], 0)
+    end
 end
 
 # Copy-constructor
@@ -234,6 +238,9 @@ ref(population::Population, ind...) = population.chromosomes[ind...]
 # Utility functions
 size(population::Population) = population.pop_size
 length(population::Population) = population.pop_size
+
+# overload (+) for easier appending
+(+)(pop::Population, chr::Chromosome) = push(pop, chr)
 
 # sum of the fitness of all chromosomes of a population
 function fitness_sum(population::Population) 
