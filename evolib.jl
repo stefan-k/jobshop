@@ -6,13 +6,13 @@
 #          Stefan Kroboth
 #
 # TODO: 
-#  * Create random Gene with constraints
-#  * Create random Chromosome
+#  * [DONE] Create random Gene with constraints
+#  * [DONE] Create random Chromosome
 #  * [DONE] properly implement sort!() for the population
 #  * try to get the type constraints to work
 #  * more printing functions (human readable)
 #  * possibility to flag chromosomes as 'bad'
-#  * handling of objective functions
+#  * [PARTIAL?] handling of objective functions
 #  * [DONE] roulette wheel selection 
 #    - needs objective function and a working sort
 #      + Update: why would it need the objective function? What was I thinking?
@@ -28,7 +28,7 @@
 #  * stopping criterion
 #  * should Vector rather be AbstractArray{T,1} ?
 #  * when adding Chromosome to Population, check that the number of
-#    of genes per chromosome are the same
+#    genes per chromosome are the same
 #  * It could be that sort doesn't need to be implemented as long as
 #    isless is defined for a certain type -- we should check that
 #  * add more to the todo list
@@ -353,6 +353,23 @@ function roulette(pop::Population)
     error("weird error that should not happen. You probably didn't define a fitness.")
 end
 
+function roulette(p::Vector{Float64})
+    prop = sortr(p) # do not sort in-place!
+    prop_sum = sum(prop) # In case it doesn't sum up to 1
+    idx = rand()*prop_sum
+    x = 0
+    elem = 1
+    for i=1:length(prop)
+        x += prop[i]
+        if idx < x
+            return elem
+        end
+        elem += 1
+    end
+    error("dafuq?")
+end
+
+
 # return several indices determined by roulette
 roulette(pop::Population, num::Int64) = [ roulette(pop) | i = 1:num ]
 
@@ -423,3 +440,10 @@ function crossover(chr1::Chromosome, chr2::Chromosome, slices::Int64)
 end
 
 crossover(chr1::Chromosome, chr2::Chromosome) = crossover(chr1, chr2, 2)
+
+################################################################################
+## GENETIC ALGORITHM                                                          ##
+################################################################################
+
+
+
