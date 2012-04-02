@@ -31,6 +31,8 @@
 #    genes per chromosome are the same
 #  * It could be that sort doesn't need to be implemented as long as
 #    isless is defined for a certain type -- we should check that
+#  * [PRIORITY] Remove the dirty hack in roulette!
+#  * Implement adapting the standard deviation of genes
 #  * add more to the todo list
 
 # I have no idea what I'm doing
@@ -127,13 +129,13 @@ type Chromosome <: AbstractChromosome
     end
 
     function Chromosome(genes::Vector{Gene})
-        print("Warning: No objective function passed!\n")
+        #print("Warning: No objective function passed!\n")
         new(copy(genes), length(genes), Inf, (x)->()) # hack, I don't know how to pass
                                                       # a 'None' function
     end
 
     function Chromosome(genes::Vector{Gene}, fitness::Float64)
-        print("Warning: No objective function passed!\n")
+        #print("Warning: No objective function passed!\n")
         new(copy(genes), length(genes), copy(fitness), (x)->())
     end
 
@@ -145,9 +147,9 @@ type Chromosome <: AbstractChromosome
         new(copy(genes), length(genes), copy(fitness), obj_func)
     end
 
-    function Chromosomes()
-        print("Warning: No objective function passed!\n")
-        new(Genes[], 0, Inf, (x)->())
+    function Chromosome()
+        #print("Warning: No objective function passed!\n")
+        new(Gene[], 0, Inf, (x)->())
     end
 end
 
@@ -218,6 +220,7 @@ function narrow_std(chromosome::Chromosome, factor::Float64)
 end
 
 rand(T::Type{Chromosome}, num::Int64, x...) = Chromosome([rand(Gene, x...) | i=1:num]) # neat
+rand(T::Type{Chromosome}, num::Int64, obj_func::Function, x...) = Chromosome([rand(Gene, x...) | i=1:num], obj_func) # neat
 
 ################################################################################
 ## POPULATION TYPE                                                            ##
@@ -247,8 +250,7 @@ end
 
 # Copy-constructor
 function copy(pop::Population)
-    Population(copy(chromosomes),
-               copy(pop_size))
+    Population(copy(pop.chromosomes))
 end
 
 # referencing
@@ -320,6 +322,7 @@ function sortr(population::Population)
 end
 
 # well, that one was easy.
+rand(T::Type{Population}, chr_num::Int64, gene_num::Int64, obj_func::Function, x...) = Population([rand(Chromosome, gene_num, obj_func, x...) | i = 1:chr_num])
 rand(T::Type{Population}, chr_num::Int64, gene_num::Int64, x...) = Population([rand(Chromosome, gene_num, x...) | i = 1:chr_num])
 
 ################################################################################
@@ -333,6 +336,10 @@ type Generations <: AbstractGenerations
 
     function Generations(population)
         new([copy(population)], 1)
+    end
+
+    function Generations()
+        new(Population[], 0)
     end
 end
 
@@ -392,7 +399,10 @@ function roulette(pop::Population)
     x = 0
     elem = 1
     for i=1:length(pop)
-        x += 1/pop[i].fitness
+        # DIRTY DIRTY HACK!
+        # This is supposed to work without abs(), but this leads to problems when
+        # negative fitness is allowed... we have to find a fix for this.
+        x += abs(1/pop[i].fitness)
         if idx < x
             return elem
         end
@@ -561,7 +571,7 @@ end
 function crossover(chr1::Chromosome, chr2::Chromosome, slices::Int64)
     @assert length(chr1) == length(chr2)
     # weird, even works when rand produces 0
-    idx = sort([1, int64(round(length(chr1) * rand(slices))), length(chr1)+1])
+    idx = sort([1, int64(round((length(chr1)-1) * rand(slices)))+1, length(chr1)+1])
     #tmp = copy(chr1)
     chr1n = copy(chr1)
     chr2n = copy(chr2)
@@ -581,32 +591,52 @@ function crossover(pop::Population, slices::Int64)
 end
 
 crossover(chr1::Chromosome, chr2::Chromosome) = crossover(chr1, chr2, 2)
+crossover(pop::Population) = crossover(pop, 2)
 
 ################################################################################
 ## GENETIC ALGORITHM                                                          ##
 ################################################################################
 
 function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int64, obj_func::Function)
+    # First version of a genetic algorithm - pretty basic, needs a lot more functionality and
+    # probably even a better design and more flexibility.
+
     pop_o = copy(pop) # prevent in-place fiasco
+    obj_func(pop_o) # make sure the the fitness for every chromosome is available
     
-    gen = Generation()
+    gen = Generations() # Discussion: This might get pretty big... what to do?
     for j = 1:iter # max generations
         pop_n = Population()
-        # FITNESS!
         for i = 1:length(pop_o)
             operation = roulette(probabilities)
             if operation == Mutation
-                pop_n + mutate(pop_o[roulette(pop_o)])
+                chr = mutate(pop_o[roulette(pop_o)])
             elseif operation == Recombination
-                pop_n + crossover(pop_o)
+                chr = crossover(pop_o)
+                chr = chr[1] # for future: take both offsprings!
             elseif operation == Reproduction
-                pop_n + copy(pop_o[roulette(pop_o)])
+                chr = copy(pop_o[roulette(pop_o)])
             elseif operation == Immigration
-                pop_n + rand(Chromosome, length(pop_o[1]))
+                chr = rand(Chromosome, length(pop_o[1]), obj_func)
             end
+            #[obj_func(chr[k]) | k=1:length(chr)] # for recombination?
+            obj_func(chr)
+            pop_n + chr
         end
+        sort!(pop_n)
+        # lol, I'm sure there is a better way to print xD
+        print("x1=")
+        print(pop_n[1][1].gene)
+        print(" x2=")
+        print(pop_n[1][2].gene)
+        println()
         gen + pop_n
         pop_o = copy(pop_n)
     end
 end
 
+################################################################################
+## EVOLUTIONARY ALGORITHM                                                     ##
+################################################################################
+
+# TODO
