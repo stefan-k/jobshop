@@ -355,6 +355,8 @@ function push(generations::Generations, population::Population)
     generations.generations += 1
 end
 
+(+)(generations::Generations, population::Population) = push(generations, population)
+
 ################################################################################
 ## DATASTRUCTURE FOR GENETIC ALGORITHM PROBABILITIES                          ##
 ################################################################################
@@ -584,9 +586,27 @@ crossover(chr1::Chromosome, chr2::Chromosome) = crossover(chr1, chr2, 2)
 ## GENETIC ALGORITHM                                                          ##
 ################################################################################
 
-function genetic(pop::Population, probabilities::GeneticProbabilities)
-    operation = roulette(probabilities)
-    #if operation == Mutation
-
+function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int64, obj_func::Function)
+    pop_o = copy(pop) # prevent in-place fiasco
+    
+    gen = Generation()
+    for j = 1:iter # max generations
+        pop_n = Population()
+        # FITNESS!
+        for i = 1:length(pop_o)
+            operation = roulette(probabilities)
+            if operation == Mutation
+                pop_n + mutate(pop_o[roulette(pop_o)])
+            elseif operation == Recombination
+                pop_n + crossover(pop_o)
+            elseif operation == Reproduction
+                pop_n + copy(pop_o[roulette(pop_o)])
+            elseif operation == Immigration
+                pop_n + rand(Chromosome, length(pop_o[1]))
+            end
+        end
+        gen + pop_n
+        pop_o = copy(pop_n)
+    end
 end
 
