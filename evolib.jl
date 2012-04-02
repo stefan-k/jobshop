@@ -35,10 +35,11 @@
 
 # I have no idea what I'm doing
 abstract AbstractEvolutionary
-abstract AbstractGene        <: AbstractEvolutionary
-abstract AbstractChromosome  <: AbstractEvolutionary
-abstract AbstractPopulation  <: AbstractEvolutionary
-abstract AbstractGenerations <: AbstractEvolutionary
+abstract AbstractGene                 <: AbstractEvolutionary
+abstract AbstractChromosome           <: AbstractEvolutionary
+abstract AbstractPopulation           <: AbstractEvolutionary
+abstract AbstractGenerations          <: AbstractEvolutionary
+abstract AbstractGeneticProbabilities <: AbstractEvolutionary
 
 ################################################################################
 ## GENE TYPE                                                                  ##
@@ -334,11 +335,35 @@ function push(generations::Generations, population::Population)
 end
 
 ################################################################################
+## DATASTRUCTURE FOR GENETIC ALGORITHM PROBABILITIES                          ##
+################################################################################
+
+type GeneticProbabilities <: AbstractGeneticProbabilities
+    mutation::Float64
+    recombination::Float64
+    reproduction::Float64
+    immigration::Float64
+
+    function GeneticProbabilities(mutation::Float64, 
+                                  recombination::Float64,
+                                  reproduction::Float64,
+                                  immigration::Float64)
+        sum = mutation + recombination + reproduction + immigration
+        new(mutation/sum, recombination/sum, reproduction/sum, immigration/sum)
+    end
+end
+
+get_vector(gp::GeneticProbabilities) = [gp.mutation, gp.recombination, gp.reproduction, gp.immigration]
+
+
+################################################################################
 ## FUNCTIONS                                                                  ##
 ################################################################################
 
+# Roulette Wheel Selection on Population
 function roulette(pop::Population)
-    sort!(pop)
+    #sort!(pop) # I don't think sorting is necessary and might even lead to 
+                # problems... gotta check that
     f_sum = inv_fitness_sum(pop)
     idx = rand()*f_sum
     x = 0
@@ -353,8 +378,14 @@ function roulette(pop::Population)
     error("weird error that should not happen. You probably didn't define a fitness.")
 end
 
+# return several indices determined by roulette
+roulette(pop::Population, num::Int64) = [ roulette(pop) | i = 1:num ]
+
+# Roulette Wheel Selection on general Vectors (in case probabilies are passed)
 function roulette(p::Vector{Float64})
-    prop = sortr(p) # do not sort in-place!
+    # Am I thinking wrong? Is sorting even necessary?
+    #prop = sortr(p) # do not sort in-place!
+    prop = copy(p)
     prop_sum = sum(prop) # In case it doesn't sum up to 1
     idx = rand()*prop_sum
     x = 0
@@ -369,9 +400,7 @@ function roulette(p::Vector{Float64})
     error("dafuq?")
 end
 
-
-# return several indices determined by roulette
-roulette(pop::Population, num::Int64) = [ roulette(pop) | i = 1:num ]
+roulette(gp::GeneticProbabilities) = roulette(get_vector(gp))
 
 # make sure the gene doesn't exceed it's limits
 function assess_limits(g::Gene)
@@ -445,5 +474,6 @@ crossover(chr1::Chromosome, chr2::Chromosome) = crossover(chr1, chr2, 2)
 ## GENETIC ALGORITHM                                                          ##
 ################################################################################
 
-
+function genetic(pop::Population, probabilities::GeneticProbabilities)
+end
 
