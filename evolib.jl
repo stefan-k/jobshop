@@ -92,11 +92,8 @@ end
 rand(T::Type{Gene}) = Gene(rand(), rand())
 rand(T::Type{Gene}, std::Float64) = Gene(rand(), std)
 rand(T::Type{Gene}, upper_limit::Float64, lower_limit::Float64) = Gene(rand(), rand(), upper_limit, lower_limit)
-function rand(T::Type{Gene}, std::Float64, upper_limit::Float64, lower_limit::Float64) 
-    # creates values in the given limit
-    val = rand()*(upper_limit-lower_limit)+lower_limit
-    Gene(val, std, upper_limit, lower_limit)
-end
+# create value in the given limit
+rand(T::Type{Gene}, std::Float64, upper_limit::Float64, lower_limit::Float64) = Gene(rand()*(upper_limit-lower_limit)+lower_limit, std, upper_limit, lower_limit)
 
 ################################################################################
 ## CHROMOSOME TYPE                                                            ##
@@ -131,6 +128,10 @@ type Chromosome <: AbstractChromosome
     function Chromosome(genes::Vector{Gene}, fitness::Float64)
         print("Warning: No objective function passed!\n")
         new(copy(genes), length(genes), copy(fitness), (x)->())
+    end
+
+    function Chromosome(genes::Vector{Gene}, obj_func::Function)
+        new(copy(genes), length(genes), Inf, obj_func)
     end
 
     function Chromosome(genes::Vector{Gene}, fitness::Float64, obj_func::Function)
@@ -196,6 +197,16 @@ function narrow_std(chromosome::Chromosome, factor::Float64)
         narrow_std(chromosome[i], factor)
     end
 end
+
+rand(T::Type{Chromosome}, num::Int64) = Chromosome([rand(Gene) | i=1:num]) # neat
+rand(T::Type{Chromosome}, num::Int64, obj_func::Function) = Chromosome([rand(Gene) | i=1:num], obj_func) 
+rand(T::Type{Chromosome}, num::Int64, std::Float64) = Chromosome([rand(Gene, std) | i=1:num])
+rand(T::Type{Chromosome}, num::Int64, std::Float64, obj_func::Function) = Chromosome([rand(Gene, std) | i=1:num], obj_func)
+rand(T::Type{Chromosome}, num::Int64, upper_limit::Float64, lower_limit::Float64) = Chromosome([rand(Gene, upper_limit, lower_limit) | i=1:num])
+rand(T::Type{Chromosome}, num::Int64, upper_limit::Float64, lower_limit::Float64, obj_func::Function) = Chromosome([rand(Gene, upper_limit, lower_limit) | i=1:num], obj_func)
+rand(T::Type{Chromosome}, num::Int64, std::Float64, upper_limit::Float64, lower_limit::Float64) = Chromosome([rand(Gene, std, upper_limit, lower_limit) | i=1:num])
+rand(T::Type{Chromosome}, num::Int64, std::Float64, upper_limit::Float64, lower_limit::Float64, obj_func::Function) = Chromosome([rand(Gene, std, upper_limit, lower_limit) | i=1:num], obj_func)
+
 
 ################################################################################
 ## POPULATION TYPE                                                            ##
