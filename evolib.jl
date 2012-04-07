@@ -222,6 +222,14 @@ end
 rand(T::Type{Chromosome}, num::Int64, x...) = Chromosome([rand(Gene, x...) | i=1:num]) # neat
 rand(T::Type{Chromosome}, num::Int64, obj_func::Function, x...) = Chromosome([rand(Gene, x...) | i=1:num], obj_func) # neat
 
+function print(chromosome::Chromosome)
+    for i = 1:length(chromosome.genes)
+        print("|")
+        print(chromosome[i].gene)
+    end
+    println("|")
+end
+
 ################################################################################
 ## POPULATION TYPE                                                            ##
 ################################################################################
@@ -624,12 +632,11 @@ function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int
             pop_n + chr
         end
         sort!(pop_n)
-        # lol, I'm sure there is a better way to print xD
-        print("x1=")
-        print(pop_n[1][1].gene)
-        print(" x2=")
-        print(pop_n[1][2].gene)
-        println()
+        
+        # Print best chromosome
+        print("Best chromosome of generation $(dec(j,3)): ")
+        print(pop_n[1])
+        
         gen + pop_n
         pop_o = copy(pop_n)
     end
