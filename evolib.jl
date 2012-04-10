@@ -38,6 +38,7 @@
 #    - bits() could be helpful for that
 #    - check if there is a way to convert to gray code
 #    - BitGene might not be necessary, maybe BitChromosome is better -> RFC
+#  * [PRIORITY] Make gray2binary work for bitstrings
 #  * discuss about how to split up this file
 #  * add more to the todo list
 
@@ -127,12 +128,34 @@ type BitGene <: AbstractGene
     end
 
     function BitGene{T<:Integer}(gene::T)
-        new(to_gray(gene), T)
+        new(int2gray(gene), T)
     end
 end
 
-to_gray(num::Integer) = bits(num $ (num >> 1))
+int2gray(num::Integer) = bits(num $ (num >> 1))
 
+function binary2int(bs::ASCIIString)
+    tmp = copy(bs)
+    s_len = length(tmp)
+    out = 0
+    for i = s_len-1:-1:0
+        # this feels so dirty...
+        out += 2^i*parse_int(ASCIIString([uint8(tmp[s_len-i])]))
+    end
+    return out
+end
+
+function gray2binary(num::Integer) 
+    tmp = copy(num)
+    shift = 1
+    while shift < 8*sizeof(num)
+        tmp = tmp $ (tmp >> shift)
+        shift *= 2
+    end
+    return tmp
+end
+
+gray2binary(s::ASCIIString) = gray2binary(binary2int(s))
 
 ################################################################################
 ## CHROMOSOME TYPE                                                            ##
