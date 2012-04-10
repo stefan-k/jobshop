@@ -6,19 +6,9 @@
 #          Stefan Kroboth
 #
 # TODO: 
-#  * [DONE] Create random Gene with constraints
-#  * [DONE] Create random Chromosome
-#  * [DONE] properly implement sort!() for the population
 #  * try to get the type constraints to work
 #  * more printing functions (human readable)
 #  * possibility to flag chromosomes as 'bad'
-#  * [PARTIAL?] handling of objective functions
-#    - new idea: get rid of the objective function within types entirely
-#  * [DONE] roulette wheel selection 
-#    - needs objective function and a working sort
-#      + Update: why would it need the objective function? What was I thinking?
-#  * [DONE] crossover
-#  * [DONE] mutation
 #  * different selection/competition models 
 #    - replace parents
 #    - in competition with parents
@@ -34,12 +24,22 @@
 #    isless is defined for a certain type -- we should check that
 #  * [PRIORITY] Remove the dirty hack in roulette!
 #  * Implement adapting the standard deviation of genes
-#  * [DONE] Create type BitGene for "classical" genetic algorithms
-#    - [DONE] bits() could be helpful for that
-#    - [DONE] check if there is a way to convert to gray code
 #  * [PRIORITY] Make gray2binary work for bitstrings
 #  * discuss about how to split up this file
 #  * add more to the todo list
+#
+# DONE:
+#  * [DONE] Create random Gene with constraints
+#  * [DONE] Create random Chromosome
+#  * [DONE] properly implement sort!() for the population
+#  * [DONE] handling of objective functions
+#    - [DONE] new idea: get rid of the objective function within types entirely
+#  * [DONE] roulette wheel selection 
+#  * [DONE] crossover
+#  * [DONE] mutation
+#  * [DONE] Create type BitGene for "classical" genetic algorithms
+#    - [DONE] bits() could be helpful for that
+#    - [DONE] check if there is a way to convert to gray code
 
 # I have no idea what I'm doing
 abstract AbstractEvolutionary
@@ -168,53 +168,24 @@ type Chromosome <: AbstractChromosome
     genes::Vector
     length::Int64
     fitness::Float64
-    obj_func::Function
 
-    function Chromosome(genes::Vector{Gene}, obj_func::Function) 
-        new(map(copy, genes), length(genes), Inf, obj_func)
-        # map ensures that each element of the vector is copied,
-        # not just the array itself. copy() would just copy the array
-        # and leave all references in genes as the are, which is wrong.
-
-        # the following might not work... 
-        # maybe fitness shouldn't be calculated when created.
-        # but I think it's a good idea to keep the objective function around.
-        # Or maybe not (what if the objective function changes?). 
-        # Comments requested ;)
-        fitness = obj_func(genes)
-    end
-
-    function Chromosome(genes::Vector{Gene})
-        #print("Warning: No objective function passed!\n")
-        new(copy(genes), length(genes), Inf, (x)->()) # hack, I don't know how to pass
-                                                      # a 'None' function
+    function Chromosome(genes::Vector{Gene}) 
+        new(map(copy, genes), length(genes), Inf)
     end
 
     function Chromosome(genes::Vector{Gene}, fitness::Float64)
-        #print("Warning: No objective function passed!\n")
-        new(copy(genes), length(genes), copy(fitness), (x)->())
-    end
-
-    function Chromosome(genes::Vector{Gene}, obj_func::Function)
-        new(copy(genes), length(genes), Inf, obj_func)
-    end
-
-    function Chromosome(genes::Vector{Gene}, fitness::Float64, obj_func::Function)
-        new(copy(genes), length(genes), copy(fitness), obj_func)
+        new(copy(genes), length(genes), copy(fitness))
     end
 
     function Chromosome()
-        #print("Warning: No objective function passed!\n")
-        new(Gene[], 0, Inf, (x)->())
+        new(Gene[], 0, Inf)
     end
 end
 
 # Copy-constructor
 function copy(chr::Chromosome)
-    # not sure if function has to be copied
     Chromosome(copy(chr.genes), 
-               copy(chr.fitness),
-               copy(chr.obj_func))
+               copy(chr.fitness))
 end
 
 # referencing
@@ -249,11 +220,6 @@ end
 
 (+)(chr::Chromosome, g::Gene) = push(chr, g)
 
-# apply the objective function defined in the Chromosome type
-function apply_obj_func(chromosome::Chromosome)
-    chromosome.fitness = chromosome.obj_func(chromosome) # not sure if this works, gotta test
-end
-
 # apply an objective function to a chromosome
 function apply_obj_func(chromosome::Chromosome, obj_func::Function)
     # untested
@@ -276,7 +242,12 @@ function narrow_std(chromosome::Chromosome, factor::Float64)
 end
 
 rand(T::Type{Chromosome}, num::Int64, x...) = Chromosome([rand(Gene, x...) | i=1:num]) # neat
-rand(T::Type{Chromosome}, num::Int64, obj_func::Function, x...) = Chromosome([rand(Gene, x...) | i=1:num], obj_func) # neat
+
+function rand(T::Type{Chromosome}, num::Int64, obj_func::Function, x...) 
+    chr = rand(T, num, x...)
+    chr.fitness = obj_func(chr)
+    return chr
+end
 
 function print(chromosome::Chromosome)
     for i = 1:length(chromosome.genes)
