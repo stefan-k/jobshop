@@ -131,6 +131,10 @@ type BitGene <: AbstractGene
     end
 end
 
+rand(T::Type{BitGene}) = BitGene(randi(Int64))
+rand(T::Type{BitGene}, U::Type) = BitGene(randi(U))
+
+# Binary utility functions
 int2gray(num::Integer) = bits(num $ (num >> 1))
 
 function binary2int(bs::ASCIIString)
