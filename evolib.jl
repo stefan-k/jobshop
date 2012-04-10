@@ -13,6 +13,7 @@
 #  * more printing functions (human readable)
 #  * possibility to flag chromosomes as 'bad'
 #  * [PARTIAL?] handling of objective functions
+#    - new idea: get rid of the objective function within types entirely
 #  * [DONE] roulette wheel selection 
 #    - needs objective function and a working sort
 #      + Update: why would it need the objective function? What was I thinking?
@@ -33,6 +34,10 @@
 #    isless is defined for a certain type -- we should check that
 #  * [PRIORITY] Remove the dirty hack in roulette!
 #  * Implement adapting the standard deviation of genes
+#  * Create type BitGene for "classical" genetic algorithms
+#    - bits() could be helpful for that
+#    - check if there is a way to convert to gray code
+#  * discuss about how to split up this file
 #  * add more to the todo list
 
 # I have no idea what I'm doing
