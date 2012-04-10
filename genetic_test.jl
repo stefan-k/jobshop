@@ -13,7 +13,7 @@ end
 
 # in case someone wants to calculate the objective function for a population
 function rosenbrock(pop::Population)
-    for i=length(pop)
+    @parallel for i=1:length(pop)
         rosenbrock(pop[i])
     end
 end
@@ -22,7 +22,7 @@ end
 probs = GeneticProbabilities(0.799, 0.1, 0.1, 0.001)
 
 # randomly initialize a population with 100 chromosomes
-popul = rand(Population, 100, 2, rosenbrock, 0.1, 6.0, -6.0 )
+popul = rand(Population, 100, 2, rosenbrock, 1.0, 6.0, -6.0 )
 
 # launch genetic algorithm
-genetic(popul, probs, 100, rosenbrock)
+@time genetic(popul, probs, 1000, rosenbrock)
