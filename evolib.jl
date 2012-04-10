@@ -34,10 +34,9 @@
 #    isless is defined for a certain type -- we should check that
 #  * [PRIORITY] Remove the dirty hack in roulette!
 #  * Implement adapting the standard deviation of genes
-#  * Create type BitGene for "classical" genetic algorithms
-#    - bits() could be helpful for that
-#    - check if there is a way to convert to gray code
-#    - BitGene might not be necessary, maybe BitChromosome is better -> RFC
+#  * [DONE] Create type BitGene for "classical" genetic algorithms
+#    - [DONE] bits() could be helpful for that
+#    - [DONE] check if there is a way to convert to gray code
 #  * [PRIORITY] Make gray2binary work for bitstrings
 #  * discuss about how to split up this file
 #  * add more to the todo list
