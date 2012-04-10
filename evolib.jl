@@ -37,6 +37,7 @@
 #  * Create type BitGene for "classical" genetic algorithms
 #    - bits() could be helpful for that
 #    - check if there is a way to convert to gray code
+#    - BitGene might not be necessary, maybe BitChromosome is better -> RFC
 #  * discuss about how to split up this file
 #  * add more to the todo list
 
@@ -73,7 +74,8 @@ type Gene <: AbstractGene
         new(gene, std, NaN, NaN)
     end
     
-    function Gene(gene::Number, std::Float64, upper_limit::Float64, lower_limit::Float64)
+    function Gene(gene::Number, std::Float64, upper_limit::Float64, 
+                  lower_limit::Float64)
         if lower_limit >= upper_limit
             error("lower_limit must be less than upper_limit")
         end
@@ -108,6 +110,29 @@ rand(T::Type{Gene}, std::Float64) = Gene(rand(), std)
 rand(T::Type{Gene}, upper_limit::Float64, lower_limit::Float64) = Gene(rand()*(upper_limit-lower_limit)+lower_limit, rand(), upper_limit, lower_limit)
 # create value in the given limit
 rand(T::Type{Gene}, std::Float64, upper_limit::Float64, lower_limit::Float64) = Gene(rand()*(upper_limit-lower_limit)+lower_limit, std, upper_limit, lower_limit)
+
+################################################################################
+## BIT GENE TYPE                                                              ##
+################################################################################
+
+type BitGene <: AbstractGene
+    gene::ASCIIString # in gray code
+    gene_type::Type   # for converting back
+
+    function BitGene(gene_type::Type, gene::ASCIIString)
+        if 8*sizeof(gene_type) != length(gene)
+            error("length of ASCII string does not agree with provided type")
+        end
+        new(gene, gene_type)
+    end
+
+    function BitGene{T<:Integer}(gene::T)
+        new(to_gray(gene), T)
+    end
+end
+
+to_gray(num::Integer) = bits(num $ (num >> 1))
+
 
 ################################################################################
 ## CHROMOSOME TYPE                                                            ##
