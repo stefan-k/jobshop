@@ -13,16 +13,17 @@ end
 
 # in case someone wants to calculate the objective function for a population
 function rosenbrock(pop::Population)
-    @parallel for i=1:length(pop)
+    #pmap(rosenbrock, pop)
+    for i=1:length(pop)
         rosenbrock(pop[i])
     end
 end
 
 # define the probability of each genetic operation
-probs = GeneticProbabilities(0.799, 0.1, 0.1, 0.001)
+probs = GeneticProbabilities(0.2, 0.499, 0.3, 0.001)
 
 # randomly initialize a population with 100 chromosomes
-popul = rand(Population, 100, 2, rosenbrock, 1.0, 6.0, -6.0 )
+popul = rand(Population, 100, 2, rosenbrock, 0.1, 6.0, -6.0 )
 
 # launch genetic algorithm
 @time genetic(popul, probs, 1000, rosenbrock)

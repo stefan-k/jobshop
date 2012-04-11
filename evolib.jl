@@ -9,6 +9,8 @@
 #  * try to get the type constraints to work
 #  * more printing functions (human readable)
 #  * possibility to flag chromosomes as 'bad'
+#  * test BitGene and adjust mutation/recombination for BitGene
+#  * RFC: BitGene or BinaryGene
 #  * different selection/competition models 
 #    - replace parents
 #    - in competition with parents
@@ -639,7 +641,8 @@ function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int
     pop_o = copy(pop) # prevent in-place fiasco
     obj_func(pop_o) # make sure the the fitness for every chromosome is available
     
-    gen = Generations() # Discussion: This might get pretty big... what to do?
+    # NOT keeping all generations around is a bit faster
+    #gen = Generations() # Discussion: This might get pretty big... what to do?
     for j = 1:iter # max generations
         pop_n = Population()
         for i = 1:length(pop_o)
@@ -655,16 +658,17 @@ function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int
                 chr = rand(Chromosome, length(pop_o[1]), obj_func)
             end
             #[obj_func(chr[k]) | k=1:length(chr)] # for recombination?
-            obj_func(chr)
+            #obj_func(chr)
             pop_n + chr
         end
+        obj_func(pop_n)
         sort!(pop_n)
         
         # Print best chromosome
         print("Best chromosome of generation $(dec(j,3)): ")
         print(pop_n[1])
         
-        gen + pop_n
+        #gen + pop_n
         pop_o = copy(pop_n)
     end
 end
