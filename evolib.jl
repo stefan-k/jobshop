@@ -6,7 +6,8 @@
 #          Stefan Kroboth
 #
 # TODO: 
-#  * try to get the type constraints to work
+#  * adopt design to better work with evolutionary strategies not just genetic 
+#    algorithms.
 #  * more printing functions (human readable)
 #  * possibility to flag chromosomes as 'bad'
 #  * test BitGene and adjust mutation/recombination for BitGene
@@ -28,6 +29,7 @@
 #  * Implement adapting the standard deviation of genes
 #  * [PRIORITY] Make gray2binary work for bitstrings
 #  * discuss about how to split up this file
+#  * [NOT IMPORTANT] try to get the type constraints to work
 #  * add more to the todo list
 #
 # DONE:
@@ -256,7 +258,7 @@ function print(chromosome::Chromosome)
         print("|")
         print(chromosome[i].gene)
     end
-    println("|")
+    print("|")
 end
 
 ################################################################################
@@ -326,6 +328,14 @@ function print_population(population::Population)
     end
 end
 
+function print_population_evo(population::Population)
+    for i=1:length(population)
+        tmp = population[i]
+        print("$tmp ")
+    end
+    print("\n")
+end
+
 # Modifiers
 function push(population::Population, chromosome::Chromosome)
     push(population.chromosomes, copy(chromosome))
@@ -356,6 +366,21 @@ end
 # reverse sort
 function sortr(population::Population)
     sort(ismore, population.chromosomes)
+end
+
+# increase standard deviation of all genes in Chromosome
+function broaden_std(population::Population, factor::Float64)
+    for i = 1:length(population)
+        # this can probably be done with map
+        broaden_std(population[i], factor)
+    end
+end
+
+# decrease standard deviation of all genes in Chromosome
+function narrow_std(population::Population, factor::Float64)
+    for i = 1:length(population)
+        narrow_std(population[i], factor)
+    end
 end
 
 # well, that one was easy.
@@ -677,4 +702,49 @@ end
 ## EVOLUTIONARY ALGORITHM                                                     ##
 ################################################################################
 
-# TODO
+function evo_1plus1(pop::Population, epsilon::Number, factor::Float64, 
+                    prop_pos::Float64, iter::Integer, inner_iter::Integer, 
+                    obj_func::Function)
+    # doesn't fit perfectly in the current design, therefore each chromosome
+    # is assumed to only consist of one Gene.
+    # We could also just let the User pass one Chromosome, which doesn't fit 
+    # nicely in the theory which is defined as only to act on the Chromosome.
+
+    pop_o = copy(pop)
+    prev_fitness = obj_func(pop_o)
+
+
+    while true # not really clear if this is necessary from the lecture notes
+        pos_mut = 0;
+        for i=1:iter
+            # create new, mutated population
+            pop_n = Population()
+            for k=1:length(pop_o)
+                pop_n + mutate(pop_o[k])
+            end
+            fitness = obj_func(pop_n)
+
+            # abort mission
+            if abs(prev_fitness - fitness) < epsilon
+                print("Optimum: ")
+                print_population_evo(pop_o)
+                return pop_n
+            elseif i%inner_iter == 0
+                # adapt std after inner_iter iterations
+                if pos_mut/i < prop_pos
+                    broaden_std(pop_o, factor) # ooops, this might be implementend the wrong way, check
+                else
+                    narrow_std(pop_o, factor)
+                end
+            end
+
+            # survival of the fittest
+            if fitness < prev_fitness
+                pop_o = copy(pop_n)
+                print_population_evo(pop_o)
+                pos_mut += 1
+                prev_fitness = fitness
+            end
+        end
+    end
+end
