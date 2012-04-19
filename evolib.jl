@@ -748,3 +748,53 @@ function evo_1plus1(pop::Population, epsilon::Number, factor::Float64,
         end
     end
 end
+
+function evo_slash(pop::Population, rho::Integer, lambda::Integer, iter::Integer,
+                   factor::Float64, epsilon::Float64, obj_func::Function)
+    # rho is the number of parents involved in one descendent. the design does
+    # not account for that for now, therefore it is a useless parameter.
+    pop_o = copy(pop)
+    obj_func(pop_o)
+    mu = length(pop_o)
+    prev_fitness = Inf
+
+    for i=1:iter
+        pop_n = Population()
+        while length(pop_n) < lambda
+            chrs = crossover(pop_o)
+            # randomly adjust std of Genes. Not sure if this is
+            # supposed to be done for each new chromosome individually
+            # or for the whole new population...
+            for j=1:length(chrs)
+                if randbit() == 1
+                    broaden_std(chrs[j], factor)
+                else
+                    narrow_std(chrs[j], factor)
+                end
+                # push mutated thingy
+                pop_n + mutate(chrs[j]) 
+            end
+        end
+
+        obj_func(pop_n)
+        sort!(pop_n)
+        # slice new population
+        pop_o = Population(pop_n[1:mu])
+
+        # stopping criterion
+        # not good at all....
+        if abs(prev_fitness - pop_o[1].fitness) < epsilon
+            print("Optimum: ")
+            print(pop_o[1])
+            println()
+            return pop_o
+        end
+
+        print(pop_o[1])
+        println()
+        prev_fitness = copy(pop_o[1].fitness)
+    end
+    pop_o
+end
+
+
