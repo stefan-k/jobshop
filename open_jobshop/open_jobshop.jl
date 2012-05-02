@@ -89,6 +89,20 @@ function print(problem::OpenJobShopProblem)
 	print("-----------------------------")
 end
 
+function rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines)
+	# Generate jobs:
+	jobs = Job[]
+	for i in 1:num_jobs
+	 	operations = Operation[]
+	 	# Add a random number of operations to the job:
+	 	for j = 1:num_machines
+	 	 	push(operations,Operation(i, j, randi(20)))
+	 	end
+	 	push(jobs, Job(i,operations))
+	end
+
+	return  OpenJobShopProblem(num_machines, jobs)
+end
 
 ################################################################################
 ## SCHEDULE TYPE                                                            ##
@@ -136,7 +150,7 @@ function next_operations(schedule::Schedule, time::Int64)
 	return (next, next_per_machine[next][1])
 end
 
-function total_duration(schedule::Schedule)
+function compute_makespan(schedule::Schedule)
 	max_ops = map(max, schedule.time_tables)
 	max_end_times = map((x)->(x[1]+x[2].duration-1), max_ops)
 	
@@ -158,9 +172,9 @@ function print(schedule::Schedule)
 	current_start_times = (map((x)->(0), schedule.time_tables))
 	#current_start_times = current_operations
 
-	max_time = total_duration(schedule)
+	makespan = compute_makespan(schedule)
 	
-	while time <= max_time
+	while time <= makespan
 		# TODO only get next_operations if necessary (not in every timestep)
 		(machines, next_time) = next_operations(schedule, time)
 		
@@ -204,6 +218,8 @@ function print(schedule::Schedule)
 		
 		time += 1
 	end
+	println()
+	println("Makespan (total time): ", makespan, "s" )
 	println()
 	#end
 	# print("|")
