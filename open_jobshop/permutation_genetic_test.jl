@@ -7,6 +7,8 @@ load("permutation_genetic.jl")
 # Initialize
 num_jobs = 5
 num_machines = 9
+
+srand(123)
 problem = rand(OpenJobShopProblem, num_jobs, num_machines)
 
 # Create initial schedule (just for comparison)

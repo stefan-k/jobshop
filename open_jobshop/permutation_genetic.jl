@@ -52,9 +52,14 @@ function generate_op_map(problem::OpenJobShopProblem)
 	return op_map
 end
 
-
+#
+# There is (or should be) a lot of intelligence in this function:
+#  - Create valid schedule from a permutation
+#  - Try to swap operations if it shortens the makespan
+#
 function schedule_from_chromosome(problem::OpenJobShopProblem, chromosome)
 
+	# TODO handle non-integer, non-unique chromosomes received from the evolib
 
 	op_map = generate_op_map(problem)
 	
