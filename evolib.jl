@@ -220,7 +220,6 @@ end
 
 # replace Genes of a Chromosome
 function assign(chr::Chromosome, gs::Vector{Gene}, idx::Vector{Int64})
-    chr.genes[idx] = map(copy, gs)
 end
 
 # push gene onto the chromosome
@@ -709,12 +708,14 @@ function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int
         sort!(pop_n)
         
         # Print best chromosome
-        print("Best chromosome of generation $(dec(j,3)): ")
-        print(pop_n[1])
+        #print("Best chromosome of generation $(dec(j,3)): ")
+        #print(pop_n[1])
         
         #gen + pop_n
         pop_o = copy(pop_n)
     end
+
+    return pop_o[1] # best solution
 end
 
 ################################################################################

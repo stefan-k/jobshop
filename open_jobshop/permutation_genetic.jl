@@ -5,20 +5,21 @@
 load("open_jobshop.jl")
 load("../evolib.jl")
 
-function permutation_genetic(problem::OpenJobShopProblem)
+function permutation_genetic(problem::OpenJobShopProblem, population_size, max_generations)
 
-	chromosome = initial_chromosome(problem)
+	objective_function = (x) -> ( makespan_objective_function(problem, x) )
+	num_genes = num_operations(problem)
 
-	print("Created initial chromosome: ")
-	println(chromosome)
-	schedule = schedule_from_permutation_chromosome(problem, chromosome)
+	population = rand(Population, population_size, num_genes, objective_function)
+	result = genetic(population, GeneticProbabilities(1.0,1.0,1.0,1.0), max_generations, objective_function)
 
-	# TODO: # Create random initial population
-
-	return schedule
+	return schedule_from_chromosome(problem, result)
 
 end
 
+#
+# NOT USED
+#
 function initial_chromosome(problem::OpenJobShopProblem)
 
 	genes = Gene[]
@@ -49,6 +50,26 @@ end
 
 
 #
+# Compute the makespan for each chromosome and set it directly
+#
+function makespan_objective_function(problem::OpenJobShopProblem, population::Population)
+	for i = 1:length(population)
+		makespan_objective_function(problem, population.chromosomes[i])
+	end
+end
+
+function makespan_objective_function(problem::OpenJobShopProblem, chromosome::Chromosome)
+	chromosome.fitness = compute_makespan(schedule_from_chromosome(problem, chromosome))
+end
+
+#
+# Function that combines the functions below
+#
+function schedule_from_chromosome(problem::OpenJobShopProblem, chromosome::Chromosome)
+	return schedule_from_permutation_chromosome(problem, permutation_chromosome(chromosome))
+end
+
+#
 # IDEA: The evolib creates real-valued genes, we need integers.
 # Rounding is not enough though, because we need unique genes.
 # This functions chooses the best matching gene for each operation and takes its
@@ -58,14 +79,13 @@ end
 # IDEA: iterate over genes in sorted order
 #
 function permutation_chromosome(c::Chromosome)
-
-	chromosome = copy(c)
-	println("original chromo", chromosome)
+	num_genes = length(c.genes)
+	# Stretch chromosome over the range of values (creates a copy):
+	chromosome = num_genes * c
 	genes = map(x->x.gene, chromosome.genes)
+	values = [1:num_genes]
 
-	values = [1:1length(chromosome)]
-
-	for i = 1:length(chromosome)
+	for i = 1:num_genes
 		gene = chromosome.genes[i].gene
 		dists = map((x)->(abs(x - gene)), values)
 		mini = find(dists == min(dists))
@@ -74,11 +94,8 @@ function permutation_chromosome(c::Chromosome)
 		values[index] = NaN # Make shure this one never gets chosen again
 	end
 
-	println("permutation chromo", chromosome)
-
 	return chromosome
 end
-
 
 #
 #  Create valid schedule from a permutation

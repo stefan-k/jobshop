@@ -109,6 +109,8 @@ function rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines)
 	return  OpenJobShopProblem(num_machines, jobs)
 end
 
+num_operations(problem::OpenJobShopProblem) = length(problem.jobs) * num_machines
+
 ################################################################################
 ## SCHEDULE TYPE                                                            ##
 ################################################################################
