@@ -41,6 +41,7 @@ end
 	
 # end
 
+
 function generate_op_map(problem::OpenJobShopProblem)
 	op_map = HashTable{Int64, Operation}()
 	for job in problem.jobs
@@ -52,38 +53,39 @@ function generate_op_map(problem::OpenJobShopProblem)
 	return op_map
 end
 
+
 #
-# There is (or should be) a lot of intelligence in this function:
-#  - Create valid schedule from a permutation
-#  - Try to swap operations if it shortens the makespan
+#  Create valid schedule from a permutation
+# TODO handle non-integer, non-unique chromosomes received from the evolib
 #
 function schedule_from_chromosome(problem::OpenJobShopProblem, chromosome)
-
-	# TODO handle non-integer, non-unique chromosomes received from the evolib
-
-	op_map = generate_op_map(problem)
-	
 	# The order of operations within a job is arbitrary!
-	
-	# Naive (faulty) scheduling:
-	# Put the tasks on the machines without checking if another job is running at the same time:
+	# An operation can be scheduled when the machine is ready *and* the previous op
+	# from the same job has finished
 
-	# Initialize time tables:
+	# Init
+	op_map = generate_op_map(problem)
 	time_tables = TimeTable[]
-	times = Int64[]
+	machine_times = Int64[]
 	for i = 1:problem.num_machines
 		push(time_tables, TimeTable())
-		push(times, 1)
+		push(machine_times, 1)
 	end
+	job_times = ones(length(problem.jobs))
 
 	# Fill time tables:
 	for i = 1:length(chromosome.genes)
 		op_id = chromosome.genes[i].gene
 		op = op_map[op_id]
 		time_table = time_tables[op.machine]
-		time_table[times[op.machine]] = op # Reference to operation!
+		# Take first available time considering machine & job:
+		start_time = max((machine_times[op.machine], job_times[op.job_index]))
+		time_table[start_time] = op # Reference to operation!
 		#println("Machine ", op.machine, ": op ", op.id, ": ",times[op.machine]," + ", op.duration, " = ", times[op.machine]+op.duration)
-		times[op.machine] += op.duration
+		
+		# Update both times for the next op:
+		machine_times[op.machine] = start_time + op.duration
+		job_times[op.job_index]   = start_time + op.duration
 	end
 	
 

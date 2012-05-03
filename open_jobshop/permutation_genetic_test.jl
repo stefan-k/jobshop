@@ -8,7 +8,7 @@ load("permutation_genetic.jl")
 num_jobs = 5
 num_machines = 9
 
-srand(123)
+srand(123) # always create the same test case, comment this out if you want a different test case in every run
 problem = rand(OpenJobShopProblem, num_jobs, num_machines)
 
 # Create initial schedule (just for comparison)
