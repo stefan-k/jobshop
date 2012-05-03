@@ -25,11 +25,13 @@ end
 # Return entry with the smallest key which is greater or equal
 # to mini
 function mingeq(table::HashTable, bottom::Int64)
-	mini = Inf
+	mini = typemax(Int64) # Inf doesnt work well with Int64 type
 	for (k,v) in table
+		
 		if k < mini && k>= bottom
 			mini = k
 		end
+		
 	end
 	
 	return mini
@@ -46,6 +48,7 @@ type Operation
 	job_index::Int64 # Pointer to job would make it circular
 	machine::Int64
 	duration::Int64 # Everything's discrete
+	id::Int64 # Unique ID for each operation
 end
 
 function print(op::Operation)
@@ -92,11 +95,13 @@ end
 function rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines)
 	# Generate jobs:
 	jobs = Job[]
+	operation_id = 1
 	for i in 1:num_jobs
 	 	operations = Operation[]
 	 	# Add a random number of operations to the job:
 	 	for j = 1:num_machines
-	 	 	push(operations,Operation(i, j, randi(20)))
+	 	 	push(operations,Operation(i, j, randi(20), operation_id))
+	 	 	operation_id += 1
 	 	end
 	 	push(jobs, Job(i,operations))
 	end
@@ -116,6 +121,10 @@ type Schedule
 	
 	# A time_table for each machine
 	time_tables::Array{TimeTable}
+
+	function Schedule(time_tables::Array{TimeTable}) # Why is this necessary?
+		new(time_tables)
+	end
 
 	# Create an initial valid schedule from an open job shop problem
 	# by simply executing all jobs one after another
@@ -145,8 +154,8 @@ end
 # e.g. if time==3 and two operations start at 5, both ops are returned.
 function next_operations(schedule::Schedule, time::Int64)
 	next_per_machine = map(mingeq, schedule.time_tables, time)
-	# Select machines with smallest start time:
 	next = find(next_per_machine == min(next_per_machine))
+	
 	return (next, next_per_machine[next][1])
 end
 
@@ -157,6 +166,8 @@ function compute_makespan(schedule::Schedule)
 	return max(max_end_times)
 end
 
+
+# TODO: fix bug in makespan
 function print(schedule::Schedule)
 	num_machines = length(schedule.time_tables)
 
@@ -177,6 +188,7 @@ function print(schedule::Schedule)
 	while time <= makespan
 		# TODO only get next_operations if necessary (not in every timestep)
 		(machines, next_time) = next_operations(schedule, time)
+		#println("next", machines,next_time)
 		
 		# Print timestep
 		print("|", lpad(time,6), "|")
@@ -194,13 +206,10 @@ function print(schedule::Schedule)
 
 			time_table = schedule.time_tables[i]
 			current_start_time = current_start_times[i]
-			#println("current start time now $current_start_time")
-
+			
 			# Check if the current operation has run out:
 			if current_start_time > 0
 				op = time_table[current_start_time]
-				#println("Current op $op")
-				#println("(current_start_time + op.duration) >= time: ($current_start_time + $(op.duration) >= $time)")
 				if (current_start_time + op.duration) <= time
 					current_start_time = 0
 				end
