@@ -98,6 +98,12 @@ end
 # Utility functions
 std(gene::Gene) = gene.std
 
+function *(factor::Number, gene::Gene)
+    g = copy(gene)
+    g.gene *= factor
+    return g
+end
+
 # increase standard deviation
 function broaden_std(gene::Gene, factor::Float64)
     gene.std *= factor
@@ -114,6 +120,7 @@ rand(T::Type{Gene}, std::Float64) = Gene(rand(), std)
 rand(T::Type{Gene}, upper_limit::Float64, lower_limit::Float64) = Gene(rand()*(upper_limit-lower_limit)+lower_limit, rand(), upper_limit, lower_limit)
 # create value in the given limit
 rand(T::Type{Gene}, std::Float64, upper_limit::Float64, lower_limit::Float64) = Gene(rand()*(upper_limit-lower_limit)+lower_limit, std, upper_limit, lower_limit)
+
 
 ################################################################################
 ## BIT GENE TYPE                                                              ##
@@ -259,6 +266,18 @@ function print(chromosome::Chromosome)
         print(chromosome[i].gene)
     end
     print("|")
+end
+
+# Multiply all genes in the chromosome by a scalar
+function *(factor::Number, chromosome::Chromosome)
+    c = copy(chromosome)
+    genes = Gene[]
+    for g in c.genes
+        push(genes,factor*g)
+    end
+    c.genes = genes
+
+    return c
 end
 
 ################################################################################

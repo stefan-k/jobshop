@@ -7,11 +7,11 @@ load("../evolib.jl")
 
 function permutation_genetic(problem::OpenJobShopProblem)
 
-	chromosome = PermutationChromosome(problem)
+	chromosome = initial_chromosome(problem)
 
 	print("Created initial chromosome: ")
 	println(chromosome)
-	schedule = schedule_from_chromosome(problem, chromosome)
+	schedule = schedule_from_permutation_chromosome(problem, chromosome)
 
 	# TODO: # Create random initial population
 
@@ -19,11 +19,7 @@ function permutation_genetic(problem::OpenJobShopProblem)
 
 end
 
-# TODO OpenJobShop namespace?
-# type PermutationGeneticChromosome <: Chromosome # TODO This is more elegant. Why do i get a 
-
-	
-function PermutationChromosome(problem::OpenJobShopProblem)
+function initial_chromosome(problem::OpenJobShopProblem)
 
 	genes = Gene[]
 
@@ -38,8 +34,6 @@ function PermutationChromosome(problem::OpenJobShopProblem)
 	
 	return Chromosome(genes)
 end
-	
-# end
 
 
 function generate_op_map(problem::OpenJobShopProblem)
@@ -55,15 +49,47 @@ end
 
 
 #
+# IDEA: The evolib creates real-valued genes, we need integers.
+# Rounding is not enough though, because we need unique genes.
+# This functions chooses the best matching gene for each operation and takes its
+# index, so a valid permutation is created
+#
+# PROBLEM: It favors the left most genes over the right most genes
+# IDEA: iterate over genes in sorted order
+#
+function permutation_chromosome(c::Chromosome)
+
+	chromosome = copy(c)
+	println("original chromo", chromosome)
+	genes = map(x->x.gene, chromosome.genes)
+
+	values = [1:1length(chromosome)]
+
+	for i = 1:length(chromosome)
+		gene = chromosome.genes[i].gene
+		dists = map((x)->(abs(x - gene)), values)
+		mini = find(dists == min(dists))
+		index = mini[1]
+		chromosome.genes[i].gene = index #ERROR
+		values[index] = NaN # Make shure this one never gets chosen again
+	end
+
+	println("permutation chromo", chromosome)
+
+	return chromosome
+end
+
+
+#
 #  Create valid schedule from a permutation
 # TODO handle non-integer, non-unique chromosomes received from the evolib
 #
-function schedule_from_chromosome(problem::OpenJobShopProblem, chromosome)
+function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
 	# The order of operations within a job is arbitrary!
 	# An operation can be scheduled when the machine is ready *and* the previous op
 	# from the same job has finished
 
-	# Init
+	# Initilize:
 	op_map = generate_op_map(problem)
 	time_tables = TimeTable[]
 	machine_times = Int64[]
@@ -78,16 +104,16 @@ function schedule_from_chromosome(problem::OpenJobShopProblem, chromosome)
 		op_id = chromosome.genes[i].gene
 		op = op_map[op_id]
 		time_table = time_tables[op.machine]
+		
 		# Take first available time considering machine & job:
 		start_time = max((machine_times[op.machine], job_times[op.job_index]))
 		time_table[start_time] = op # Reference to operation!
-		#println("Machine ", op.machine, ": op ", op.id, ": ",times[op.machine]," + ", op.duration, " = ", times[op.machine]+op.duration)
 		
 		# Update both times for the next op:
 		machine_times[op.machine] = start_time + op.duration
 		job_times[op.job_index]   = start_time + op.duration
 	end
 	
-
+	# Create Schedule object:
 	return Schedule(time_tables)
 end
