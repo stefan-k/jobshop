@@ -8,7 +8,7 @@ load("../evolib.jl")
 function permutation_genetic(problem::OpenJobShopProblem, population_size, max_generations)
 
 	objective_function = (x) -> ( makespan_objective_function(problem, x) )
-	num_genes = num_operations(problem)
+	num_genes = count_operations(problem)
 
 	population = rand(Population, population_size, num_genes, objective_function)
 	result = genetic(population, GeneticProbabilities(1.0,1.0,1.0,1.0), max_generations, objective_function)
@@ -38,7 +38,7 @@ end
 
 
 function generate_op_map(problem::OpenJobShopProblem)
-	op_map = HashTable{Int64, Operation}()
+	op_map = Dict{Int64, Operation}(count_operations(problem))
 	for job in problem.jobs
 		for op in job.operations
 			op_map[op.id] = op

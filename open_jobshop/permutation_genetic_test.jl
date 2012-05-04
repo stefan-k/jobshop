@@ -4,6 +4,7 @@
 
 load("permutation_genetic.jl")
 
+
 # Initialize
 num_jobs = 5
 num_machines = 9
@@ -18,7 +19,7 @@ println("Initial schedule makespan:", compute_makespan(initial_schedule))
 
 # Solve
 population_size = 100
-max_generations = 1000
+max_generations = 100
 @time optimal_schedule = permutation_genetic(problem, population_size, max_generations)
 
 

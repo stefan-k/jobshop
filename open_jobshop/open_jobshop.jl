@@ -12,7 +12,7 @@
 
 #TODO built-in function exists?
 # NOT USED
-function minkey(table::HashTable)
+function minkey(table::Dict)
 	mini = Inf
 	for (k,v) in table
 		if k < mini
@@ -24,7 +24,7 @@ end
 
 # Return entry with the smallest key which is greater or equal
 # to mini
-function mingeq(table::HashTable, bottom::Int64)
+function mingeq(table::Dict, bottom::Int64)
 	mini = typemax(Int64) # Inf doesnt work well with Int64 type
 	for (k,v) in table
 		
@@ -109,13 +109,16 @@ function rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines)
 	return  OpenJobShopProblem(num_machines, jobs)
 end
 
-num_operations(problem::OpenJobShopProblem) = length(problem.jobs) * num_machines
+# Getter functions:
+# TODO replace length(problem.jobs) by num_jobs(problem) everywhere
+count_operations(problem::OpenJobShopProblem) = length(problem.jobs) * num_machines
+count_jobs(problem::OpenJobShopProblem) = length(problem.jobs)
 
 ################################################################################
 ## SCHEDULE TYPE                                                            ##
 ################################################################################
 
-typealias TimeTable HashTable{Int64, Operation}
+typealias TimeTable Dict{Int64, Operation}
 
 # Simple schedule representation
 # Can be invalid!
@@ -135,7 +138,7 @@ type Schedule
 		# Initialize time tables:
 		time_tables = TimeTable[]
 		for i = 1:problem.num_machines
-			push(time_tables, TimeTable())
+			push(time_tables, TimeTable(count_jobs(problem)))
 		end
 
 		# Fill time tables:
@@ -190,7 +193,6 @@ function print(schedule::Schedule)
 	while time <= makespan
 		# TODO only get next_operations if necessary (not in every timestep)
 		(machines, next_time) = next_operations(schedule, time)
-		#println("next", machines,next_time)
 		
 		# Print timestep
 		print("|", lpad(time,6), "|")
@@ -199,12 +201,9 @@ function print(schedule::Schedule)
 		for i = 1:num_machines
 
 			# Check if there's a new operation on this machine:
-			#println(time== next_time, contains(machines, i))
 			if (time == next_time) && (contains(machines, i))
 				current_start_times[i] = time
-				#println("Set current to $time")
 			end
-
 
 			time_table = schedule.time_tables[i]
 			current_start_time = current_start_times[i]
@@ -229,20 +228,9 @@ function print(schedule::Schedule)
 		
 		time += 1
 	end
+
 	println()
 	println("Makespan (total time): ", makespan, "s" )
 	println()
-	#end
-	# print("|")
-	# for i = 1: (6+13*length(schedule.time_tables))
-	# 	print("-")
-	# end
-	# println("|")
-
-	# print("|")
-	# for i = 1: (6+13*length(schedule.time_tables))
-	# 	print("-")
-	# end
-	# println("|")
 end
 
