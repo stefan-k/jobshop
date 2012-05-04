@@ -1,20 +1,22 @@
+# Documentation #
+
 @stefan-k Let's write all documentation in [Markdown](http://warpedvisions.org/projects/markdown-cheat-sheet/)?
 
 
-# Contents #
+## Contents ##
 
 * The files in the **open_jobshop** directory consider the Open Shop Scheduling Problem (OSSP) and use the evolib.
 
  
-# TODO #
+## TODO ##
 
 * Maybe use alias Int/Uint instead of Int64?
 * Test OSSP results against benchmark db
 * OSSP efficiency
 
-# Results #
+## Results ##
 
-## First attempt to plug OSSP into genetic algorithm ##
+### First attempt to plug OSSP into genetic algorithm ###
 
 5 jobs, 9 machines, initial makespan = total time = 482 (time if all jobs are exeuted one after another)
 
