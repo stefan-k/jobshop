@@ -276,7 +276,7 @@ end
 function print(chromosome::Chromosome)
     for i = 1:length(chromosome.genes)
         print("|")
-        print(chromosome[i].gene)
+        printf("%.10f", chromosome[i].gene)
     end
     print("|")
 end
@@ -734,7 +734,7 @@ function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int
         pop_o = copy(pop_n)
     end
 
-    println("Genetic algorithm found best solution w/ fitness $(best.fitness) in generation $best_generation.")
+    #println("Genetic algorithm found best solution w/ fitness $(best.fitness) in generation $best_generation.")
 
     return best
 end

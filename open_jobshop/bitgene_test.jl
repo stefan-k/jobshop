@@ -14,8 +14,6 @@ for job in problem.jobs
     end
 end
 
-#new(genes) # I hope this does what i want: Return a new PermutationGeneticChromosome with 'genes' as genes
-
 c1 = Chromosome(genes)
 c2 = rand(Chromosome, BitGene, count_operations(problem))
 

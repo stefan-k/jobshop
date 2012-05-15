@@ -8,17 +8,25 @@ load("../evolib.jl")
 #
 # Prepare an OSSP problem for the genetic algorithm and run it
 #
-function permutation_genetic(problem::OpenJobShopProblem, population_size, max_generations)
+function permutation_genetic(problem::OpenJobShopProblem, probs::GeneticProbabilities, population_size, max_generations)
 
     objective_function = (x) -> ( makespan_objective_function(problem, x) )
     num_genes = count_operations(problem)
 
     population = rand(Population, population_size, num_genes, objective_function)
-    result = genetic(population, GeneticProbabilities(1.0,1.0,1.0,1.0), max_generations, objective_function)
+    result = genetic(population, probs, max_generations, objective_function)
 
     return schedule_from_chromosome(problem, result)
 
 end
+
+function permutation_genetic(problem::OpenJobShopProblem, population_size, max_generations)
+
+    return schedule_from_chromosome(problem, GeneticProbabilities(1.0,1.0,1.0,1.0), population_size, max_generations)
+
+end
+
+
 
 #
 # NOT USED

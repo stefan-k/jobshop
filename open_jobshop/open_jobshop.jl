@@ -113,6 +113,7 @@ end
 # TODO replace length(problem.jobs) by num_jobs(problem) everywhere
 count_operations(problem::OpenJobShopProblem) = length(problem.jobs) * problem.num_machines
 count_jobs(problem::OpenJobShopProblem) = length(problem.jobs)
+count_machines(problem::OpenJobShopProblem) = problem.num_machines
 
 ################################################################################
 ## SCHEDULE TYPE                                                            ##
@@ -126,15 +127,16 @@ type Schedule
     
     # A time_table for each machine
     time_tables::Array{TimeTable}
+    makespan::Number
 
     function Schedule(time_tables::Array{TimeTable}) # Why is this necessary?
-        new(time_tables)
+        new(time_tables, Inf)
     end
 
     # Create an initial valid schedule from an open job shop problem
     # by simply executing all jobs one after another
     function Schedule(problem::OpenJobShopProblem)
-        
+
         # Initialize time tables:
         time_tables = TimeTable[]
         for i = 1:problem.num_machines
@@ -151,7 +153,7 @@ type Schedule
                 time += op.duration
             end
         end
-        new(time_tables)
+        new(time_tables, Inf)
     end
 end 
 
@@ -165,10 +167,16 @@ function next_operations(schedule::Schedule, time::Int64)
 end
 
 function compute_makespan(schedule::Schedule)
+
+    if schedule.makespan != Inf
+        return schedule.makespan
+    end
+
     max_ops = map(max, schedule.time_tables)
     max_end_times = map((x)->(x[1]+x[2].duration-1), max_ops)
-    
-    return max(max_end_times)
+    schedule.makespan = max(max_end_times)
+
+    return schedule.makespan
 end
 
 

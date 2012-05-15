@@ -31,3 +31,7 @@ Makespan of permutation [1,2,3,...,50]: 169 (reduced to 35%)
 |     100 |             10 |                 148 |     30.71% |         |
 |     100 |            100 |                 146 |     30.29% |         |
 |     100 |           1000 |                 148 |     30.71% |   83.29s|
+
+
+Evaluation of 10 random problems with different genetic probabilities:
+
