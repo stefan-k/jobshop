@@ -125,6 +125,8 @@ rand(T::Type{Gene}, std::Float64, upper_limit::Float64, lower_limit::Float64) = 
 ################################################################################
 ## BIT GENE TYPE                                                              ##
 ################################################################################
+# TODO why do we store the gene as a string and not as a bitmap?
+
 
 type BitGene <: AbstractGene
     gene::ASCIIString # in gray code
@@ -171,20 +173,28 @@ end
 
 gray2binary(s::ASCIIString) = gray2binary(binary2int(s))
 
+print(g::BitGene) = println('<',g.gene, '>')
+
+
+
+
 ################################################################################
 ## CHROMOSOME TYPE                                                            ##
 ################################################################################
+
+abstract AbstractGeneVector#TODO move this
+Vector{BitGene} <: AbstractGeneVector
 
 type Chromosome <: AbstractChromosome
     genes::Vector
     length::Int64
     fitness::Float64
 
-    function Chromosome(genes::Vector{Gene}) 
+    function Chromosome(genes::Vector) 
         new(map(copy, genes), length(genes), Inf)
     end
 
-    function Chromosome(genes::Vector{Gene}, fitness::Float64)
+    function Chromosome(genes::Vector, fitness::Float64)
         new(copy(genes), length(genes), copy(fitness))
     end
 
@@ -198,7 +208,6 @@ function copy(chr::Chromosome)
     Chromosome(copy(chr.genes), 
                copy(chr.fitness))
 end
-
 # referencing
 ref(chromosome::Chromosome, ind...) = chromosome.genes[ind...]
 
@@ -251,6 +260,11 @@ function narrow_std(chromosome::Chromosome, factor::Float64)
     end
 end
 
+
+#rand(T::Type{Chromosome}, S::Type{AbstractGene}, num::Int64, x...) = Chromosome([rand(S, x...) | i=1:num]) # neat
+rand{GeneType<:AbstractGene}(T::Type{Chromosome},S::Type{GeneType}, num::Int64, x...) = Chromosome([rand(S, x...) | i=1:num]) # neat
+
+# Keep this versionfor compability with old test cases:
 rand(T::Type{Chromosome}, num::Int64, x...) = Chromosome([rand(Gene, x...) | i=1:num]) # neat
 
 function rand(T::Type{Chromosome}, num::Int64, obj_func::Function, x...) 
@@ -686,6 +700,9 @@ function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int
     
     # NOT keeping all generations around is a bit faster
     #gen = Generations() # Discussion: This might get pretty big... what to do?
+    
+    best = pop_o[1]
+    best_generation = 0
     for j = 1:iter # max generations
         pop_n = Population()
         for i = 1:length(pop_o)
@@ -707,15 +724,19 @@ function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int
         obj_func(pop_n)
         sort!(pop_n)
         
-        # Print best chromosome
-        #print("Best chromosome of generation $(dec(j,3)): ")
-        #print(pop_n[1])
-        
+        # Store best chromosome (don't know if the original algo does this as well)
+        if pop_n[1].fitness < best.fitness
+            best = pop_n[1]
+            best_generation = j
+        end
+
         #gen + pop_n
         pop_o = copy(pop_n)
     end
 
-    return pop_o[1] # best solution
+    println("Genetic algorithm found best solution w/ fitness $(best.fitness) in generation $best_generation.")
+
+    return best
 end
 
 ################################################################################

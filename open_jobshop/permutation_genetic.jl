@@ -5,6 +5,9 @@
 load("open_jobshop.jl")
 load("../evolib.jl")
 
+#
+# Prepare an OSSP problem for the genetic algorithm and run it
+#
 function permutation_genetic(problem::OpenJobShopProblem, population_size, max_generations)
 
     objective_function = (x) -> ( makespan_objective_function(problem, x) )
@@ -69,6 +72,24 @@ function schedule_from_chromosome(problem::OpenJobShopProblem, chromosome::Chrom
     return schedule_from_permutation_chromosome(problem, permutation_chromosome(chromosome))
 end
 
+# Much simpler and faster than the function below:
+# just let the order of the genes decide the permutation,
+# e.g. [2.5 7.3 2.2 1.6 9.2] -> [3 4 2 1 5]
+function permutation_chromosome(c::Chromosome)    
+    # Sort the genes:
+    genes = map(x->x.gene, c.genes)
+    (sorted, perm) = sortperm(genes)
+    
+    # Create the order from the sorting permutation
+    num_genes = length(c)
+    genes = Array(Gene, num_genes)
+    for k=1:num_genes
+        genes[perm[k]] = Gene(k)
+    end
+
+    return Chromosome(genes)
+end
+
 #
 # IDEA: The evolib creates real-valued genes, we need integers.
 # Rounding is not enough though, because we need unique genes.
@@ -78,11 +99,11 @@ end
 # PROBLEM: It favors the left most genes over the right most genes
 # IDEA: iterate over genes in sorted order
 #
-function permutation_chromosome(c::Chromosome)
+function OLD_permutation_chromosome(c::Chromosome)
     num_genes = length(c.genes)
     # Stretch chromosome over the range of values (creates a copy):
     chromosome = num_genes * c
-    genes = map(x->x.gene, chromosome.genes)
+    #genes = map(x->x.gene, chromosome.genes)
     values = [1:num_genes]
 
     for i = 1:num_genes
@@ -99,7 +120,6 @@ end
 
 #
 #  Create valid schedule from a permutation
-# TODO handle non-integer, non-unique chromosomes received from the evolib
 #
 function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
     # The order of operations within a job is arbitrary!

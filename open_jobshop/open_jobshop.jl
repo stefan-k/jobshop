@@ -111,7 +111,7 @@ end
 
 # Getter functions:
 # TODO replace length(problem.jobs) by num_jobs(problem) everywhere
-count_operations(problem::OpenJobShopProblem) = length(problem.jobs) * num_machines
+count_operations(problem::OpenJobShopProblem) = length(problem.jobs) * problem.num_machines
 count_jobs(problem::OpenJobShopProblem) = length(problem.jobs)
 
 ################################################################################
@@ -218,7 +218,9 @@ function print(schedule::Schedule)
             
             # Finally, check if operation exists and print it:
             if current_start_time > 0
-                print("  ", op, " |")
+                print("  ")
+                print(op)
+                print(" |")
             else
                 print("            |")
             end

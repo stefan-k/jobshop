@@ -15,19 +15,18 @@ problem = rand(OpenJobShopProblem, num_jobs, num_machines)
 # Create initial schedule (just for comparison)
 dumb_schedule = Schedule(problem)
 initial_schedule = schedule_from_chromosome(problem, initial_chromosome(problem))
-println("Initial schedule makespan:", compute_makespan(initial_schedule))
 
 # Solve
+println()
+println("Solving...")
 population_size = 100
 max_generations = 100
 @time optimal_schedule = permutation_genetic(problem, population_size, max_generations)
 
 
 # Output
-
 #println("Found schedule:")
-#println(optimal_schedule)
-
+print(optimal_schedule)
 t1 = compute_makespan(dumb_schedule)
 t2 = compute_makespan(optimal_schedule)
 println()
