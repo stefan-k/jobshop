@@ -215,7 +215,7 @@ ref(chromosome::Chromosome, ind...) = chromosome.genes[ind...]
 size(chromosome::Chromosome) = chromosome.length
 length(chromosome::Chromosome) = chromosome.length
 # print the stds of all genes of a chromosome indicated by a range/index
-std(chromosome::Chromosome, ind...) = [std(gene) | gene = chromosome[ind...]]
+std(chromosome::Chromosome, ind...) = [std(gene) for gene = chromosome[ind...]]
 
 # replace Gene of a Chromosome
 function assign(chr::Chromosome, g::Gene, idx::Int64)
@@ -262,10 +262,10 @@ end
 
 
 #rand(T::Type{Chromosome}, S::Type{AbstractGene}, num::Int64, x...) = Chromosome([rand(S, x...) | i=1:num]) # neat
-rand{GeneType<:AbstractGene}(T::Type{Chromosome},S::Type{GeneType}, num::Int64, x...) = Chromosome([rand(S, x...) | i=1:num]) # neat
+rand{GeneType<:AbstractGene}(T::Type{Chromosome},S::Type{GeneType}, num::Int64, x...) = Chromosome([rand(S, x...) for i=1:num]) # neat
 
 # Keep this versionfor compability with old test cases:
-rand(T::Type{Chromosome}, num::Int64, x...) = Chromosome([rand(Gene, x...) | i=1:num]) # neat
+rand(T::Type{Chromosome}, num::Int64, x...) = Chromosome([rand(Gene, x...) for i=1:num]) # neat
 
 function rand(T::Type{Chromosome}, num::Int64, obj_func::Function, x...) 
     chr = rand(T, num, x...)
@@ -416,8 +416,8 @@ function narrow_std(population::Population, factor::Float64)
 end
 
 # well, that one was easy.
-rand(T::Type{Population}, chr_num::Int64, gene_num::Int64, obj_func::Function, x...) = Population([rand(Chromosome, gene_num, obj_func, x...) | i = 1:chr_num])
-rand(T::Type{Population}, chr_num::Int64, gene_num::Int64, x...) = Population([rand(Chromosome, gene_num, x...) | i = 1:chr_num])
+rand(T::Type{Population}, chr_num::Int64, gene_num::Int64, obj_func::Function, x...) = Population([rand(Chromosome, gene_num, obj_func, x...) for i = 1:chr_num])
+rand(T::Type{Population}, chr_num::Int64, gene_num::Int64, x...) = Population([rand(Chromosome, gene_num, x...) for i = 1:chr_num])
 
 ################################################################################
 ## GENERATIONS TYPE                                                           ##
@@ -506,7 +506,7 @@ function roulette(pop::Population)
 end
 
 # return several indices determined by roulette
-roulette(pop::Population, num::Int64) = [ roulette(pop) | i = 1:num ]
+roulette(pop::Population, num::Int64) = [ roulette(pop) for i = 1:num ]
 
 # Roulette Wheel Selection on general Vectors (in case probabilies are passed)
 function roulette(p::Vector{Float64})
