@@ -22,7 +22,7 @@ end
 
 function permutation_genetic(problem::OpenJobShopProblem, population_size, max_generations)
 
-    return schedule_from_chromosome(problem, GeneticProbabilities(1.0,1.0,1.0,1.0), population_size, max_generations)
+    return permutation_genetic(problem, GeneticProbabilities(1.0,1.0,1.0,1.0), population_size, max_generations)
 
 end
 

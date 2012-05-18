@@ -51,6 +51,10 @@ type Operation
     id::Int64 # Unique ID for each operation
 end
 
+# Useful for functions like max, sort:
+isless(op1::Operation, op2::Operation) = isless(op1.duration, op2.duration)
+
+
 function print(op::Operation)
     print("#$(dec(op.job_index,2))#$(dec(op.machine,2)):$(lpad(op.duration,2))")    
 end

@@ -28,29 +28,58 @@ function hybrid_makespan(problem::OpenJobShopProblem, population::Population)
 end
 
 function hybrid_makespan(problem::OpenJobShopProblem, chromosome::Chromosome)
-    chromosome.fitness = compute_makespan(schedule_builder(problem, chromosome))
+    chromosome.fitness = compute_makespan(hybrid_schedule_builder(problem, chromosome))
 end
 
 function hybrid_schedule_builder(problem::OpenJobShopProblem, chromosome::Chromosome)
    
     # Take real-valued genes and round them
     # (Better would be implementing BitGene)
-    order = [ round(g.gene) for g in chromosome.genes ]
+    job_indices = [ convert(Int64, g.gene) for g in chromosome.genes ]
     
     num_jobs = count_jobs(problem)
     num_machines = count_machines(problem)
     
-    unfinished_jobs = 1:num_jobs #TODO better take actual objects?
-    unfinished_operations = [ 1:num_machines for i=1:num_jobs ]
+    # Work with sorted copies so the original arrays don't get messed with:
+    unfinished_jobs = [ sortr(problem.jobs[i].operations) for i=1:num_jobs ]
 
-    #TODO for index in order
-    #   i = index % length(unfinished_jobs)
-    #   ops = unfinished_operations[i]
-    #   #Schedule longest? unfinished op j in ops
-    #   #remove ops[j]
-    #   #if ops is empty, remove i from unfinished_jobs
-    # end
+    # Initialize timetables:
+    job_times = ones(num_jobs)
+    machine_times = ones(num_machines)
+    time_tables = [ TimeTable(num_jobs) for i=1:num_machines ]
+
+    for index in job_indices
+
+        job_index = (index % length(unfinished_jobs)) + 1 # one-based indices
+        unfinished_operations = unfinished_jobs[job_index]
+
+        # print("job ",job_index," {")
+        #     for o in unfinished_operations
+        #         print(o)
+        #         print(" ")
+        #     end
+        #     println("}")
+
+        # Find longest op (operations are sorted descendantly):
+        op = unfinished_operations[1]
+
+        # Schedule longest:
+        # Take first available time considering machine & job:
+        time_table = time_tables[op.machine]
+        start_time = max((machine_times[op.machine], job_times[op.job_index]))
+        time_table[start_time] = op # Reference to operation!
+        
+        # Update both times for the next op:
+        machine_times[op.machine] = start_time + op.duration
+        job_times[op.job_index]   = start_time + op.duration
+
+        # Remove operation from unfinished:
+        del(unfinished_operations, 1)
+        if isempty(unfinished_operations)
+            del(unfinished_jobs, job_index)
+        end
+    end
 
 
-   return Schedule(problem) # dummy solution
+   return Schedule(time_tables) # dummy solution
 end
