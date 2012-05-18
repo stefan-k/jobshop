@@ -129,7 +129,7 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP, probabilities::Gen
     # NOT keeping all generations around is a bit faster
     #gen = Generations() # Discussion: This might get pretty big... what to do?
     
-    best = pop_o[1]
+    best = copy(pop_o[1])
     best_generation = 0
     for j = 1:iter # max generations
         pop_n = PermutationChromosome[]
@@ -155,7 +155,8 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP, probabilities::Gen
         
         # Store best chromosome (don't know if the original algo does this as well)
         if pop_n[1].fitness < best.fitness
-            best = pop_n[1]
+            best = copy(pop_n[1])
+            println(best.fitness)
             best_generation = j
         end
 
@@ -168,16 +169,19 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP, probabilities::Gen
     return best
 end
 
-p = OSSP(3, 3, [1:9])
-chr = PermutationChromosome(3, 3, 2)
-probs = GeneticProbabilities(0.5, 0.0, 0.5, 0.0)
+#p = OSSP(5, 9, int([1:5*9]./[1:5*9]))
+jobs = 5
+machines = 9
+p = OSSP(jobs, machines, int([1:jobs*machines]))
+#chr = PermutationChromosome(3, 3, 2)
+probs = GeneticProbabilities(0.1, 0.0, 0.9, 0.0)
 #println(chr.genes)
 #println(makespan(chr, p))
 #swap_mutate!(chr)
 #println(chr.genes)
 #println(makespan(chr, p))
 
-popu = [PermutationChromosome(3, 3, i) for i = 1:100]
+popu = [PermutationChromosome(jobs, machines, 9) for i = 1:500]
 #println(typeof(popu))
 
 best = genetic(popu, p, probs, 1000, permutation_obj)
