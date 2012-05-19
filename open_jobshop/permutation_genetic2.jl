@@ -7,7 +7,8 @@ type PermutationChromosome <: AbstractChromosome
     length::Int64
     fitness::Float64
 
-    function PermutationChromosome(jobs::Integer, machines::Integer, swappiness::Integer)
+    function PermutationChromosome(jobs::Integer, machines::Integer, 
+                                   swappiness::Integer)
         g = Integer[1:jobs*machines]
         swap_mutate!(g, jobs*machines) # scramble
         new(g, swappiness, jobs*machines, Inf)
@@ -87,7 +88,8 @@ type OSSP <: AbstractEvolutionary
     num_jobs::Integer
     num_machines::Integer
 
-    function OSSP(num_jobs::Integer, num_machines::Integer, duration::Vector{Int})
+    function OSSP(num_jobs::Integer, num_machines::Integer, 
+                  duration::Vector{Int})
         jobs = Int[]
         machines = Int[]
         for i in 1:num_jobs
@@ -117,8 +119,7 @@ function makespan(chr::PermutationChromosome, p::OSSP)
 end
 
 # i <3 multiple dispatch
-permutation_obj(chr::PermutationChromosome, p::OSSP) = 
-                chr.fitness = makespan(chr, p)
+permutation_obj(chr::PermutationChromosome, p::OSSP) = chr.fitness = makespan(chr, p)
 
 function permutation_obj(pop::Vector{PermutationChromosome}, p::OSSP)
     for i in 1:length(pop)
@@ -168,15 +169,19 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP,
     return best
 end
 
-jobs = 5
-machines = 9
-srand(123) # always create the same test case, comment this out if you want a different test case in every run
-#p = OSSP(jobs, machines, int([1:jobs*machines]))
-p = OSSP(jobs, machines, randi(20, jobs*machines)) # random times
-probs = GeneticProbabilities(0.30, 0.0, 0.70, 0.0)
+function main()
+    jobs = 5
+    machines = 9
+    srand(123) # always create the same test case, comment this out if you want a different test case in every run
+    #p = OSSP(jobs, machines, int([1:jobs*machines]))
+    p = OSSP(jobs, machines, randi(20, jobs*machines)) # random times
+    probs = GeneticProbabilities(0.30, 0.0, 0.70, 0.0)
 
-popu = [PermutationChromosome(jobs, machines, 2) for i = 1:1000]
+    popu = [PermutationChromosome(jobs, machines, 2) for i = 1:1000]
 
-best = genetic(popu, p, probs, 500, permutation_obj)
-println(best.genes)
-println(best.fitness)
+    best = genetic(popu, p, probs, 500, permutation_obj)
+    println(best.genes)
+    println(best.fitness)
+end
+
+main()
