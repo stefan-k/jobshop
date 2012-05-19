@@ -1,5 +1,4 @@
-load("../evolib.jl")
-
+load("../evolib.jl") 
 
 # reimplementation of Chromosome because of the needed swappiness
 type PermutationChromosome <: AbstractChromosome
@@ -13,9 +12,18 @@ type PermutationChromosome <: AbstractChromosome
         swap_mutate!(g, jobs*machines) # scramble
         new(g, swappiness, jobs*machines, Inf)
     end
+
+    function PermutationChromosome(genes::Vector{Integer}, swappiness::Integer,
+                                   length::Int64, fitness::Float64)
+        new(genes, swappiness, length, fitness)
+    end
 end
 
 ref(chr::PermutationChromosome, ind...) = copy(chr.genes[ind...])
+copy(chr::PermutationChromosome) = PermutationChromosome(copy(chr.genes),
+                                                         copy(chr.swappiness),
+                                                         copy(chr.length),
+                                                         copy(chr.fitness))
 
 function assign(chr::PermutationChromosome, gene::Integer, idx::Integer)
     chr.genes[idx] = copy(gene)
@@ -58,16 +66,11 @@ function inv_fitness_sum(pop::Vector{PermutationChromosome})
 end
 
 function roulette(pop::Vector{PermutationChromosome})
-    #sort!(pop) # I don't think sorting is necessary and might even lead to 
-                # problems... gotta check that
     f_sum = inv_fitness_sum(pop)
     idx = rand()*f_sum
     x = 0
     elem = 1
     for i=1:length(pop)
-        # DIRTY DIRTY HACK!
-        # This is supposed to work without abs(), but this leads to problems when
-        # negative fitness is allowed... we have to find a fix for this.
         x += abs(1.0/pop[i].fitness)
         if idx < x
             return elem
@@ -114,7 +117,8 @@ function makespan(chr::PermutationChromosome, p::OSSP)
 end
 
 # i <3 multiple dispatch
-permutation_obj(chr::PermutationChromosome, p::OSSP) = makespan(chr, p)
+permutation_obj(chr::PermutationChromosome, p::OSSP) = 
+                chr.fitness = makespan(chr, p)
 
 function permutation_obj(pop::Vector{PermutationChromosome}, p::OSSP)
     for i in 1:length(pop)
@@ -122,12 +126,11 @@ function permutation_obj(pop::Vector{PermutationChromosome}, p::OSSP)
     end
 end
 
-function genetic(pop::Vector{PermutationChromosome}, p::OSSP, probabilities::GeneticProbabilities, iter::Int64, obj_func::Function)
+function genetic(pop::Vector{PermutationChromosome}, p::OSSP, 
+                 probabilities::GeneticProbabilities, iter::Int64, 
+                 obj_func::Function)
     pop_o = copy(pop) # prevent in-place fiasco
     obj_func(pop_o, p) # make sure the the fitness for every chromosome is available
-    
-    # NOT keeping all generations around is a bit faster
-    #gen = Generations() # Discussion: This might get pretty big... what to do?
     
     best = copy(pop_o[1])
     best_generation = 0
@@ -137,17 +140,14 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP, probabilities::Gen
             operation = roulette(probabilities)
             if operation == Mutation
                 chr = swap_mutate!(pop_o[roulette(pop_o)])
-            elseif operation == Recombination
-                chr = crossover(pop_o)
-                chr = chr[1] # for future: take both offsprings!
+            #elseif operation == Recombination
+                #chr = crossover(pop_o)
+                #chr = chr[1] # for future: take both offsprings!
             elseif operation == Reproduction
                 chr = copy(pop_o[roulette(pop_o)])
-            elseif operation == Immigration
-                chr = rand(Chromosome, length(pop_o[1]), obj_func)
+            #elseif operation == Immigration
+                #chr = rand(Chromosome, length(pop_o[1]), obj_func)
             end
-            #[obj_func(chr[k]) | k=1:length(chr)] # for recombination?
-            #obj_func(chr)
-            #pop_n + chr
             push(pop_n, chr)
         end
         obj_func(pop_n, p)
@@ -155,12 +155,11 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP, probabilities::Gen
         
         # Store best chromosome (don't know if the original algo does this as well)
         if pop_n[1].fitness < best.fitness
+            println("Current best: $(pop_n[1].fitness)")
             best = copy(pop_n[1])
-            println(best.fitness)
             best_generation = j
         end
 
-        #gen + pop_n
         pop_o = copy(pop_n)
     end
 
@@ -169,21 +168,15 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP, probabilities::Gen
     return best
 end
 
-#p = OSSP(5, 9, int([1:5*9]./[1:5*9]))
 jobs = 5
 machines = 9
-p = OSSP(jobs, machines, int([1:jobs*machines]))
-#chr = PermutationChromosome(3, 3, 2)
-probs = GeneticProbabilities(0.1, 0.0, 0.9, 0.0)
-#println(chr.genes)
-#println(makespan(chr, p))
-#swap_mutate!(chr)
-#println(chr.genes)
-#println(makespan(chr, p))
+srand(123) # always create the same test case, comment this out if you want a different test case in every run
+#p = OSSP(jobs, machines, int([1:jobs*machines]))
+p = OSSP(jobs, machines, randi(20, jobs*machines)) # random times
+probs = GeneticProbabilities(0.30, 0.0, 0.70, 0.0)
 
-popu = [PermutationChromosome(jobs, machines, 9) for i = 1:500]
-#println(typeof(popu))
+popu = [PermutationChromosome(jobs, machines, 2) for i = 1:1000]
 
-best = genetic(popu, p, probs, 1000, permutation_obj)
+best = genetic(popu, p, probs, 500, permutation_obj)
 println(best.genes)
 println(best.fitness)
