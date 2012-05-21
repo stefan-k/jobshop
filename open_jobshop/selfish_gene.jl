@@ -38,7 +38,6 @@ function choose_chromosome(vp::VirtualPopulation)
     for i=1:n
         randval = rand()
         limits = cumsum(vp.probabilities[i])
-        println("limits", limits)
         for j= 1:length(limits)
             if randval <= limits[j]
                 genes[i] = Gene(j)
@@ -56,7 +55,7 @@ function print(vp::VirtualPopulation)
         for prob in locus
             printf("  %.2f ",prob)
         end
-        println()
+        printf("(%.2f total)\n", sum(locus))
     end
     println()
 end
@@ -68,36 +67,143 @@ end
 
 function selfish_gene(problem::OpenJobShopProblem)
 
-    schedule = Schedule(problem) # dummy solution
-
     num_jobs = count_jobs(problem)
     num_machines = count_machines(problem)
 
-    sizes = Array(Int64, 2*num_machines)
-    for i=1:num_machines
+    sizes = Array(Int64, 2*num_jobs*num_machines)
+    for i=1:num_jobs*num_machines
         sizes[2*(i-1)+1] = num_jobs
         sizes[2*(i-1)+2] = num_machines
     end
+    
     vp = VirtualPopulation(sizes)
-    print(vp)
+    max_iter = 5000
+    best_sofar = choose_chromosome(vp)
+    
+    for i = 1:max_iter
 
-    c = choose_chromosome(vp)
-    print(c)
+        #print(vp)
 
-    return schedule
+        #println("\nIteration ", dec(i,2),":")
+        # Pick two random chromosomes form virtual population:
+        c1 = choose_chromosome(vp)
+        c2 = choose_chromosome(vp)
+        #println("  C1: ", c1, "fitness: ", selfish_fitness(problem, c1))
+        #println("  C2: ", c2, "fitness: ", selfish_fitness(problem, c2))
+        
+        #better_than = (a,b) -> (selfish_fitness(problem,a) < selfish_fitness(problem,b))
+        #(s,p) = sort(better_than, [c1,c2])
+        #println("  Order: ", p)
+
+        # Function shortcut:
+        fitness(c::Chromosome) = selfish_fitness(problem,c)
+        
+        if fitness(c1) < fitness(c2)
+            winner = c1
+            loser  = c2
+        else
+            winner = c2
+            loser  = c1
+        end
+
+        # Rewrite probabilities:
+        factor = 1.1
+        reward(vp, loser , 1.0/factor)
+        reward(vp, winner, factor)
+
+        # Check if it's the best sofar        
+        if fitness(winner) < fitness(best_sofar)
+            printf("  New best at iteration %10i: %i\n", i, fitness(winner))
+            best_sofar = winner
+        end
+
+    end
+
+    return selfish_schedule_builder(problem, best_sofar)
+
+end
+
+
+function reward(vp::VirtualPopulation, chromosome::Chromosome, factor)
+    values = [ convert(Int64, g.gene) for g in chromosome.genes ]
+    @assert length(values) == length(vp.probabilities)
+
+    for i =1:length(values)
+        value = values[i]
+        vp.probabilities[i][value] *= factor
+        vp.probabilities[i] /= sum(vp.probabilities[i])
+    end
+
+end
+
+
+function selfish_fitness(problem, chromosome)   
+
+    if chromosome.fitness == Inf
+        #println("Compute schedule...")
+        schedule = selfish_schedule_builder(problem, chromosome)
+        chromosome.fitness = compute_makespan(schedule)
+    end
+
+    return chromosome.fitness
 
 end
 
 
 
 
+function selfish_schedule_builder(problem::OpenJobShopProblem, chromosome::Chromosome)
+   
+    num_jobs = count_jobs(problem)
+    num_machines = count_machines(problem)
+    
+    indices = [ convert(Int64, g.gene) for g in chromosome.genes ]
+    @assert ( length(indices) == 2*num_jobs*num_machines) # must be even
+      
+    # Work with copies so the original arrays don't get messed with:
+    unfinished_jobs = [ copy(problem.jobs[i].operations) for i=1:num_jobs ]
 
+    # Initialize timetables:
+    job_times = ones(num_jobs)
+    machine_times = ones(num_machines)
+    time_tables = [ TimeTable(num_jobs) for i=1:num_machines ]
+
+    for i =1:2:length(indices)
+
+        job_index = ( (indices[i]  -1) % length(unfinished_jobs      )) + 1 # one-based indices
+        unfinished_operations = unfinished_jobs[job_index]
+        machine   = ( (indices[i+1]-1) % length(unfinished_operations)) + 1
+
+        op = unfinished_operations[machine]
+
+        # Take first available time considering machine & job:
+        time_table = time_tables[op.machine]
+        start_time = max((machine_times[op.machine], job_times[op.job_index]))
+        time_table[start_time] = op # Reference to operation!
+        
+        # Update both times for the next op:
+        machine_times[op.machine] = start_time + op.duration
+        job_times[op.job_index]   = start_time + op.duration
+
+        # Remove operation from unfinished:
+        del(unfinished_operations, machine)
+        if isempty(unfinished_operations)
+            del(unfinished_jobs, job_index)
+        end
+    end
+
+   return Schedule(time_tables)
+end
+
+
+
+# TODO: move to test file
 function main()
     # Initialize
     num_jobs = 5
     num_machines = 9
 
-   #srand(123) # always create the same test case, comment this out if you want a different test case in every run
+    #srand(123) # always create the same test case, comment this out if you want a different test case in every run
     problem = rand(OpenJobShopProblem, num_jobs, num_machines)
 
     # Create initial schedule (just for comparison)
@@ -106,6 +212,7 @@ function main()
     # Solve
     println()
     println("Solving...")
+
     @time optimal_schedule = selfish_gene(problem)
 
 
@@ -121,6 +228,7 @@ function main()
     print(", reduced to: ")
     printf("%.2f%%", (t2/t1)*100)
     println()
+
 end
 
 main()

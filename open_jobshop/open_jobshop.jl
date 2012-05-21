@@ -96,7 +96,9 @@ function print(problem::OpenJobShopProblem)
     print("-----------------------------")
 end
 
-function rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines)
+rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines) = rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines, 20)
+
+function rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines, max_duration)
     # Generate jobs:
     jobs = Job[]
     operation_id = 1
@@ -104,7 +106,7 @@ function rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines)
         operations = Operation[]
         # Add a random number of operations to the job:
         for j = 1:num_machines
-            push(operations,Operation(i, j, randi(20), operation_id))
+            push(operations,Operation(i, j, randi(max_duration), operation_id))
             operation_id += 1
         end
         push(jobs, Job(i,operations))

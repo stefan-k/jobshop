@@ -8,9 +8,10 @@ load("permutation_genetic.jl")
 # Initialize
 num_jobs = 5
 num_machines = 9
+max_duration = 10
 
 srand(123) # always create the same test case, comment this out if you want a different test case in every run
-problem = rand(OpenJobShopProblem, num_jobs, num_machines)
+problem = rand(OpenJobShopProblem, num_jobs, num_machines, max_duration)
 
 # Create initial schedule (just for comparison)
 dumb_schedule = Schedule(problem)
@@ -26,7 +27,7 @@ max_generations = 100
 
 # Output
 #println("Found schedule:")
-#print(optimal_schedule)
+print(optimal_schedule)
 t1 = compute_makespan(dumb_schedule)
 t2 = compute_makespan(optimal_schedule)
 println()

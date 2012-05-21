@@ -723,18 +723,22 @@ function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int
         end
         obj_func(pop_n)
         sort!(pop_n)
+
+        print(pop_n[1].fitness)
         
         # Store best chromosome (don't know if the original algo does this as well)
         if pop_n[1].fitness < best.fitness
             best = pop_n[1]
+            print("*")
             best_generation = j
         end
+        println()
 
         #gen + pop_n
         pop_o = copy(pop_n)
     end
 
-    #println("Genetic algorithm found best solution w/ fitness $(best.fitness) in generation $best_generation.")
+    println("Genetic algorithm found best solution w/ fitness $(best.fitness) in generation $best_generation.")
 
     return best
 end

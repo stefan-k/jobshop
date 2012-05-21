@@ -14,6 +14,8 @@
 * Test OSSP results against benchmark db
 * OSSP efficiency
 
+* dynamic stopping condition for selfish gene algorithm (now only max iterations)
+
 ## Results ##
 
 ### First attempt to plug OSSP into genetic algorithm ###

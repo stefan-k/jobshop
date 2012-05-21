@@ -81,5 +81,5 @@ function hybrid_schedule_builder(problem::OpenJobShopProblem, chromosome::Chromo
     end
 
 
-   return Schedule(time_tables) # dummy solution
+   return Schedule(time_tables)
 end
