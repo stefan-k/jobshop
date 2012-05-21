@@ -136,6 +136,7 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP,
     best = copy(pop_o[1])
     best_generation = 0
     for j = 1:iter # max generations
+        print("Generation ",dec(j,2), "... ")
         pop_n = PermutationChromosome[]
         for i = 1:length(pop_o)
             operation = roulette(probabilities)
@@ -156,11 +157,11 @@ function genetic(pop::Vector{PermutationChromosome}, p::OSSP,
         
         # Store best chromosome (don't know if the original algo does this as well)
         if pop_n[1].fitness < best.fitness
-            println("Current best: $(pop_n[1].fitness)")
+            print("New current best: $(pop_n[1].fitness)")
             best = copy(pop_n[1])
             best_generation = j
         end
-
+        println()
         pop_o = copy(pop_n)
     end
 
@@ -179,9 +180,11 @@ function main()
 
     popu = [PermutationChromosome(jobs, machines, 2) for i = 1:1000]
 
-    best = genetic(popu, p, probs, 500, permutation_obj)
+    num_generations = 100
+
+    best = genetic(popu, p, probs, num_generations, permutation_obj)
     println(best.genes)
     println(best.fitness)
 end
 
-main()
+@time main()

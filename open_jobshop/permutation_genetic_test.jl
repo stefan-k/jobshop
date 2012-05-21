@@ -26,7 +26,7 @@ max_generations = 100
 
 # Output
 #println("Found schedule:")
-print(optimal_schedule)
+#print(optimal_schedule)
 t1 = compute_makespan(dumb_schedule)
 t2 = compute_makespan(optimal_schedule)
 println()
@@ -37,3 +37,25 @@ print(", optimal makespan: ", t2)
 print(", reduced to: ")
 printf("%.2f%%", (t2/t1)*100)
 println()
+
+
+
+# println("Compare with pure random number generator:")
+# num_ops = num_jobs*num_machines
+# function find_best_random(n)
+#    chromosomes = [ rand(Chromosome, num_ops) for i=1:n ]
+#    lessthan = (x,y)->(compute_makespan(schedule_from_chromosome(problem,x)) < compute_makespan(schedule_from_chromosome(problem,y)))
+#    chromosomes = sort(lessthan, chromosomes)
+#    return schedule_from_chromosome(problem, chromosomes[1])
+# end
+# printf("Creating max_generations x population_size (%i x %i) random chromosomes...\n", max_generations, population_size)
+# @time  optimal_schedule = find_best_random(max_generations * population_size)
+# t2 = compute_makespan(optimal_schedule)
+# println()
+# print(num_jobs," jobs, ", num_machines, " machines, ", "Popsize=",population_size)
+# print(", Max generations=", max_generations)
+# print(", initial makespan: ", t1)
+# print(", optimal makespan: ", t2)
+# print(", reduced to: ")
+# printf("%.2f%%", (t2/t1)*100)
+# println()
