@@ -1,33 +1,46 @@
 load("../evolib.jl") 
 load("open_jobshop.jl") 
 
+
+
+################################################################################
+## VIRTUAL POPULATION TYPE                                                    ##
+################################################################################
 #
-# A virtual population holds probabilities of values for certain positions in the chromosome
-# the actual values do not matter, they are represented by their index
+# A virtual population holds probabilities of values for certain positions in
+# the chromosome. The actual values do not matter, they are represented by
+# their index.
+#
+# locus  .. the index where a value is stored
+# allele .. value stored at a certain locus    
 #
 type VirtualPopulation
     
-    probabilities :: Array{Array{Float64}} # *Not* a matrix
+    probabilities :: Vector{Vector{Float64}} # *Not* a matrix
 
-    # locus  .. the index where a value is stored
-    # allele .. value stored at a certain locus
-    function VirtualPopulation(sizes::Array{Int64}) # Initialize with equal probabilities
-        
-        new([ [1.0/size for i=1:size] for size in sizes ])
+    # Constructor with given probabilities
+    function VirtualPopulation(probabilities::Vector{Vector{Float64}})
+        new(probabilities)
+    end
 
-        # probabilities = Array{Array{Float64}}(length(sizes))
-        # for locus = 1:length(sizes)
-        #     size = sizes[locus]
-        #     p = 1.0 /size
-        #     probabilities[locus] = [p for i=1:size]
-        # end
-
-        # new(probabilities)
+    # Constructor with equiprobable alleles 
+    function VirtualPopulation(sizes::Vector{Int64}) # Initialize with equal probabilities
+        probabilities = [ [1.0/size for i=1:size] for size in sizes ]
+        new(probabilities)
     end
 
 end
 
-size(vp::VirtualPopulation) = length(vp.probabilities)
+# Check if the average maximum of the marginal probabilities is close to 1.0,
+# Which means the virtual population has "decided" on a certain allele for each locus
+#
+# The threshold was chosen empirically.
+#
+steady_state(vp::VirtualPopulation) = ( mean_max(vp) > .95)
+
+# Helper function for steady state
+mean_max(vp::VirtualPopulation) = mean([ max(locus) for locus in vp.probabilities ])
+
 
 #
 # Randomly choose chromosome from virtual population
@@ -49,6 +62,15 @@ function choose_chromosome(vp::VirtualPopulation)
     return Chromosome(genes)
 end
 
+# Helper functions:
+function copy(vp::VirtualPopulation)
+    probabilities = [ [p for p in locus] for locus in vp.probabilities ]
+    return VirtualPopulation(probabilities)
+end
+
+
+size(vp::VirtualPopulation) = length(vp.probabilities)
+
 function print(vp::VirtualPopulation)
     println("Virtual Population:")
     for locus in vp.probabilities
@@ -61,10 +83,15 @@ function print(vp::VirtualPopulation)
 end
 
 
+################################################################################
+## SELFISH GENE ALGORITHM                                                     ##
+################################################################################
 #
+# Let two individuals compete by comparing their fitness. The gene pool of the
+# winner gains dominance, i.e. its probabilities increase in the virtual
+# population.
+# The loser's probabilities are decreased.
 #
-#
-
 function selfish_gene(problem::OpenJobShopProblem)
 
     num_jobs = count_jobs(problem)
@@ -82,18 +109,9 @@ function selfish_gene(problem::OpenJobShopProblem)
     
     for i = 1:max_iter
 
-        #print(vp)
-
-        #println("\nIteration ", dec(i,2),":")
         # Pick two random chromosomes form virtual population:
         c1 = choose_chromosome(vp)
         c2 = choose_chromosome(vp)
-        #println("  C1: ", c1, "fitness: ", selfish_fitness(problem, c1))
-        #println("  C2: ", c2, "fitness: ", selfish_fitness(problem, c2))
-        
-        #better_than = (a,b) -> (selfish_fitness(problem,a) < selfish_fitness(problem,b))
-        #(s,p) = sort(better_than, [c1,c2])
-        #println("  Order: ", p)
 
         # Function shortcut:
         fitness(c::Chromosome) = selfish_fitness(problem,c)
@@ -108,16 +126,25 @@ function selfish_gene(problem::OpenJobShopProblem)
 
         # Rewrite probabilities:
         factor = 1.1
-        reward(vp, loser , 1.0/factor)
         reward(vp, winner, factor)
+        punish(vp, loser , factor)
 
-        # Check if it's the best sofar        
+        # Check if the virtual pop. is steady:
+        if steady_state(vp)
+            println()
+            println("  Population reached steady state at iteration ", i)
+            break
+        end
+
+        # Compare the winner with previous best solution:      
         if fitness(winner) < fitness(best_sofar)
             printf("  New best at iteration %10i: %i\n", i, fitness(winner))
             best_sofar = winner
         end
 
     end
+
+    println()
 
     return selfish_schedule_builder(problem, best_sofar)
 
@@ -126,7 +153,7 @@ end
 
 function reward(vp::VirtualPopulation, chromosome::Chromosome, factor)
     values = [ convert(Int64, g.gene) for g in chromosome.genes ]
-    @assert length(values) == length(vp.probabilities)
+    @assert length(values) == size(vp)
 
     for i =1:length(values)
         value = values[i]
@@ -135,6 +162,8 @@ function reward(vp::VirtualPopulation, chromosome::Chromosome, factor)
     end
 
 end
+
+punish(vp::VirtualPopulation, chromosome::Chromosome, factor) = reward(vp::VirtualPopulation, chromosome::Chromosome, 1.0/factor)
 
 
 function selfish_fitness(problem, chromosome)   
@@ -150,8 +179,20 @@ function selfish_fitness(problem, chromosome)
 end
 
 
-
-
+################################################################################
+## SELFISH GENE SCHEDULE BUILDER                                              ##
+################################################################################
+#
+# Interpret a chromosome from the virtual population as a schedule. The
+# chromosome must be of size (2 * #jobs * #machines).
+#
+# Example:
+# A chromosome {1,2, 3,4, ...} is interpreted as first scheduling the
+# 2nd unfinished operation of the 1st unfinished job, then the 4th unfinished
+# operation from the 3rd unfinished job, etc.
+# These indices are circular, i.e. if there are only 2 unfinished jobs, the
+# index 3 refers to the first unfinished job.
+#
 function selfish_schedule_builder(problem::OpenJobShopProblem, chromosome::Chromosome)
    
     num_jobs = count_jobs(problem)
@@ -196,14 +237,18 @@ function selfish_schedule_builder(problem::OpenJobShopProblem, chromosome::Chrom
 end
 
 
-
+################################################################################
+## TEST CASE                                                                  ##
+################################################################################
+#
 # TODO: move to test file
+#
 function main()
     # Initialize
     num_jobs = 5
     num_machines = 9
 
-    #srand(123) # always create the same test case, comment this out if you want a different test case in every run
+    srand(123) # always create the same test case, comment this out if you want a different test case in every run
     problem = rand(OpenJobShopProblem, num_jobs, num_machines)
 
     # Create initial schedule (just for comparison)
@@ -212,7 +257,7 @@ function main()
     # Solve
     println()
     println("Solving...")
-
+    println()
     @time optimal_schedule = selfish_gene(problem)
 
 
@@ -224,10 +269,11 @@ function main()
     println()
     print(num_jobs," jobs, ", num_machines, " machines")
     print(", initial makespan: ", t1)
-    print(", optimal makespan: ", t2)
+    print(", best found makespan: ", t2)
     print(", reduced to: ")
-    printf("%.2f%%", (t2/t1)*100)
+    printf("%.2f%%\n", (t2/t1)*100)
     println()
+
 
 end
 
