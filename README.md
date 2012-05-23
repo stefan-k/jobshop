@@ -13,6 +13,7 @@
 * Maybe use alias Int/Uint instead of Int64?
 * Test OSSP results against benchmark db
 * OSSP efficiency
+* Is there a bug in hybrid genetic? Results are poor.
 
 * **DONE** dynamic stopping condition for selfish gene algorithm (now only max iterations)
 

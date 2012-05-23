@@ -115,11 +115,31 @@ function rand(T::Type{OpenJobShopProblem}, num_jobs, num_machines, max_duration)
     return  OpenJobShopProblem(num_machines, jobs)
 end
 
+# Lower bound estimation from [Taillard'89]:
+# "The lower bound of the makespans corresponds to the maximum amount of time that a job or a machine requires"
+function lower_bound(problem::OpenJobShopProblem)
+    
+    job_max = max([ sum([op.duration for op in job.operations]) for job in problem.jobs ])
+    
+    machine_total_times = zeros(Int64, count_machines(problem))#[ 0 for i=1:count_machines(problem) ]
+    for job in problem.jobs
+        for j=1:count_machines(problem)# job.operations
+            machine_total_times[j] += job.operations[j].duration
+        end
+    end
+    machine_max = max(machine_total_times)
+    
+    println("$job_max $machine_max")
+
+    return max( [job_max, machine_max] )
+end
+
 # Getter functions:
-# TODO replace length(problem.jobs) by num_jobs(problem) everywhere
+# TODO replace length(problem.jobs) by count_jobs(problem) everywhere
 count_operations(problem::OpenJobShopProblem) = length(problem.jobs) * problem.num_machines
 count_jobs(problem::OpenJobShopProblem) = length(problem.jobs)
 count_machines(problem::OpenJobShopProblem) = problem.num_machines
+
 
 ################################################################################
 ## SCHEDULE TYPE                                                            ##
