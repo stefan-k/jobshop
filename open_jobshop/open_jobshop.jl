@@ -129,8 +129,6 @@ function lower_bound(problem::OpenJobShopProblem)
     end
     machine_max = max(machine_total_times)
     
-    println("$job_max $machine_max")
-
     return max( [job_max, machine_max] )
 end
 

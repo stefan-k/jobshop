@@ -10,10 +10,17 @@
  
 ## TODO ##
 
+### Big TODOs ###
+* Test OSSP results against benchmark db -> Joris
+* Is there a bug in hybrid genetic? Results are poor. -> Joris
+* [OPTIONAL] Try using different algorithms
+* Try different algorithm parameters
+* [OPTIONAL] Are there other problems we can solve? E.g. normal jobshop, flow shop, the "CPU-problem", ...
+
+### Small TODOs ###
+
 * Maybe use alias Int/Uint instead of Int64?
-* Test OSSP results against benchmark db
 * OSSP efficiency
-* Is there a bug in hybrid genetic? Results are poor.
 
 * **DONE** dynamic stopping condition for selfish gene algorithm (now only max iterations)
 
