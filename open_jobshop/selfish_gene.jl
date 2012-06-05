@@ -36,7 +36,7 @@ end
 #
 # The threshold was chosen empirically.
 #
-steady_state(vp::VirtualPopulation) = ( mean_max(vp) > .95)
+steady_state(vp::VirtualPopulation, stop) = ( mean_max(vp) > stop)
 
 # Helper function for steady state
 mean_max(vp::VirtualPopulation) = mean([ max(locus) for locus in vp.probabilities ])
@@ -92,7 +92,9 @@ end
 # population.
 # The loser's probabilities are decreased.
 #
-function selfish_gene(problem::OpenJobShopProblem)
+
+
+function selfish_gene(problem::OpenJobShopProblem, reward_step, stop, max_iter)
 
     num_jobs = count_jobs(problem)
     num_machines = count_machines(problem)
@@ -104,7 +106,6 @@ function selfish_gene(problem::OpenJobShopProblem)
     end
     
     vp = VirtualPopulation(sizes)
-    max_iter = 5000
     best_sofar = choose_chromosome(vp)
     
     for i = 1:max_iter
@@ -125,30 +126,33 @@ function selfish_gene(problem::OpenJobShopProblem)
         end
 
         # Rewrite probabilities:
-        factor = 1.1
-        reward(vp, winner, factor)
-        punish(vp, loser , factor)
+        reward(vp, winner, 1+reward_step)
+        punish(vp, loser , 1+reward_step)
 
         # Check if the virtual pop. is steady:
-        if steady_state(vp)
-            println()
-            println("  Population reached steady state at iteration ", i)
+        if steady_state(vp, stop)
+            #println()
+            #println("  Population reached steady state at iteration ", i)
             break
         end
 
         # Compare the winner with previous best solution:      
         if fitness(winner) < fitness(best_sofar)
-            printf("  New best at iteration %10i: %i\n", i, fitness(winner))
+            #printf("  New best at iteration %10i: %i\n", i, fitness(winner))
             best_sofar = winner
         end
 
     end
 
-    println()
+    #println()
 
     return selfish_schedule_builder(problem, best_sofar)
 
 end
+
+# Shortcut:
+selfish_gene(problem::OpenJobShopProblem) = selfish_gene(problem, .04,.95, 10000)
+
 
 
 function reward(vp::VirtualPopulation, chromosome::Chromosome, factor)
@@ -157,7 +161,7 @@ function reward(vp::VirtualPopulation, chromosome::Chromosome, factor)
 
     for i =1:length(values)
         value = values[i]
-        vp.probabilities[i][value] *= factor
+        vp.probabilities[i][value] *= factor # We use a *multiplicative* reward, it yields much better results!
         vp.probabilities[i] /= sum(vp.probabilities[i])
     end
 
@@ -235,48 +239,3 @@ function selfish_schedule_builder(problem::OpenJobShopProblem, chromosome::Chrom
 
    return Schedule(time_tables)
 end
-
-
-################################################################################
-## TEST CASE                                                                  ##
-################################################################################
-#
-# TODO: move to test file
-#
-function main()
-    # Initialize
-    num_jobs = 5
-    num_machines = 9
-
-    #srand(123) # always create the same test case, comment this out if you want a different test case in every run
-    problem = rand(OpenJobShopProblem, num_jobs, num_machines)
-
-    # Create initial schedule (just for comparison)
-    dumb_schedule = Schedule(problem)
-
-    # Solve
-    println()
-    println("Solving...")
-    println()
-    @time optimal_schedule = selfish_gene(problem)
-
-
-    # Output
-    #println("Found schedule:")
-    print(optimal_schedule)
-    t1 = compute_makespan(dumb_schedule)
-    t2 = compute_makespan(optimal_schedule)
-    println()
-    print(num_jobs," jobs, ", num_machines, " machines")
-    print(", lower bound: ", lower_bound(problem))
-    #print(", initial makespan: ", t1)
-    print(", best found makespan: ", t2)
-    #print(", reduced to: ")
-    #printf("%.2f%%\n", (t2/t1)*100)
-    println()
-    println()
-
-
-end
-
-main()
