@@ -11,9 +11,9 @@
 ## TODO ##
 
 ### Big TODOs ###
-* Test OSSP results against benchmark db -> Joris
-    * Parallel processing?
-* Is there a bug in hybrid genetic? Results are poor. -> Joris
+* Test OSSP results against benchmark db
+    * Takes a long time, Parallel processing? --> @stefank
+* Is there a bug in hybrid genetic? Results are poor. @jjbayer
 * Take a look at LibGA by [Corcoran Wainwright](http://euler.mcs.utulsa.edu/~rogerw/papers/Corcoran-sac93.pdf)
     * What is elitism? Is this a good library? (This is the library the guys in the papers use)
 * [OPTIONAL] Try using different algorithms
@@ -23,6 +23,7 @@
 
 ### Small TODOs ###
 
+* Add a field "Percentage of problems for which the lower bound was met" to the evaluation
 * Alternative to "load(...)" so we don't get "redefinition of constant" warnings?
 * Maybe use alias Int/Uint instead of Int64?
 * OSSP efficiency
