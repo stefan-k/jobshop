@@ -317,6 +317,10 @@ type Population <: AbstractPopulation
     function Population()
         new(Chromosome[], 0)
     end
+
+    function Population(size::Int)
+        new(Array(Chromosome, size), size)
+    end
 end
 
 # Copy-constructor
@@ -326,6 +330,11 @@ end
 
 # referencing
 ref(population::Population, ind...) = population.chromosomes[ind...]
+
+# assign
+function assign(pop::Population, chr::Chromosome, indx::Int64) 
+    pop.chromosomes[indx] = chr
+end
 
 # Utility functions
 size(population::Population) = population.pop_size
@@ -642,10 +651,10 @@ function mutate(pop::Population, std::Float64)
 end
 
 # in-place crossover
-function crossover!(chr1::Chromosome, chr2::Chromosome, slices::Int64)
+function crossover!(chr1::Chromosome, chr2::Chromosome, slices::Int)
     @assert length(chr1) == length(chr2)
     # weird, even works when rand produces 0
-    idx = sort([1, int64(round(length(chr1) * rand(slices))), length(chr1)+1])
+    idx = sort([1, int(round(length(chr1) * rand(slices))), length(chr1)+1])
     tmp = copy(chr1)
     for i=1:length(idx)-1
         if i%2 == 0
@@ -662,10 +671,10 @@ function crossover!(pop::Population, slices::Int64)
 end
 
 # crossover
-function crossover(chr1::Chromosome, chr2::Chromosome, slices::Int64)
+function crossover(chr1::Chromosome, chr2::Chromosome, slices::Int)
     @assert length(chr1) == length(chr2)
     # weird, even works when rand produces 0
-    idx = sort([1, int64(round((length(chr1)-1) * rand(slices)))+1, length(chr1)+1])
+    idx = sort([1, int(round((length(chr1)-1) * rand(slices)))+1, length(chr1)+1])
     #tmp = copy(chr1)
     chr1n = copy(chr1)
     chr2n = copy(chr2)
@@ -691,35 +700,34 @@ crossover(pop::Population) = crossover(pop, 2)
 ## GENETIC ALGORITHM                                                          ##
 ################################################################################
 
-function genetic(pop::Population, probabilities::GeneticProbabilities, iter::Int64, obj_func::Function)
+function genetic(pop::Population, probabilities::GeneticProbabilities, 
+                 iter::Int, obj_func::Function)
     # First version of a genetic algorithm - pretty basic, needs a lot more functionality and
     # probably even a better design and more flexibility.
 
     pop_o = copy(pop) # prevent in-place fiasco
     obj_func(pop_o) # make sure the the fitness for every chromosome is available
-    
-    # NOT keeping all generations around is a bit faster
-    #gen = Generations() # Discussion: This might get pretty big... what to do?
+    sort!(pop_o)
     
     best = pop_o[1]
     best_generation = 0
     for j = 1:iter # max generations
-        pop_n = Population()
+        pop_n = Population(length(pop_o))
+        operations = [roulette(probabilities) for i in 1:length(pop_o)]
         for i = 1:length(pop_o)
-            operation = roulette(probabilities)
+            operation = operations[i]
             if operation == Mutation
                 chr = mutate(pop_o[roulette(pop_o)])
             elseif operation == Recombination
                 chr = crossover(pop_o)
-                chr = chr[1] # for future: take both offsprings!
+                #pop_n + chr[2] # ugly, I know
+                chr = chr[1] 
             elseif operation == Reproduction
                 chr = copy(pop_o[roulette(pop_o)])
             elseif operation == Immigration
                 chr = rand(Chromosome, length(pop_o[1]), obj_func)
             end
-            #[obj_func(chr[k]) | k=1:length(chr)] # for recombination?
-            #obj_func(chr)
-            pop_n + chr
+            pop_n[i] = chr
         end
         obj_func(pop_n)
         sort!(pop_n)

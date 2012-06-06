@@ -28,7 +28,7 @@ end
 rand(generator::RandomNumberGenerator, left, right) = convert(Int64, floor(left+rand(generator)*(right-left+1))) #TODO
 
 
-function generate_problem(num_jobs, num_machines, max_duration, time_seed, machine_seed)
+function generate_problem(num_jobs::Int, num_machines::Int, max_duration::Int, time_seed::Int, machine_seed::Int)
 
     time_rand = RandomNumberGenerator(time_seed)
     machine_rand = RandomNumberGenerator(machine_seed)
@@ -36,6 +36,7 @@ function generate_problem(num_jobs, num_machines, max_duration, time_seed, machi
     # Generate jobs:
     jobs = Job[]
     operation_id = 1
+    
     for i in 1:num_jobs
         
         durations = [ rand(time_rand, 1, max_duration) for j=1:num_machines ]

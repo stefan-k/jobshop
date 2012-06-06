@@ -8,9 +8,11 @@
 #
 # Prepare an OSSP problem for the genetic algorithm and run it
 #
-function permutation_genetic(problem::OpenJobShopProblem, probs::GeneticProbabilities, population_size::Int, max_generations::Int)
+function permutation_genetic(problem::OpenJobShopProblem, 
+                             probs::GeneticProbabilities, population_size::Int, 
+                             max_generations::Int)
 
-    objective_function = (x) -> ( makespan_objective_function(problem, x) )
+    objective_function = (x::Union(Population, Chromosome)) -> ( makespan_objective_function(problem, x) )
     num_genes = count_operations(problem)
 
     population = rand(Population, population_size, num_genes, objective_function)
@@ -25,7 +27,6 @@ function permutation_genetic(problem::OpenJobShopProblem, population_size::Int, 
     return permutation_genetic(problem, GeneticProbabilities(1.0,1.0,1.0,1.0), population_size, max_generations)
 
 end
-
 
 
 #
@@ -76,8 +77,10 @@ end
 #
 # Function that combines the functions below
 #
-function schedule_from_chromosome(problem::OpenJobShopProblem, chromosome::Chromosome)
-    return schedule_from_permutation_chromosome(problem, permutation_chromosome(chromosome))
+function schedule_from_chromosome(problem::OpenJobShopProblem, 
+                                  chromosome::Chromosome)
+    return schedule_from_permutation_chromosome(problem, 
+                                  permutation_chromosome(chromosome))
 end
 
 # Much simpler and faster than the function below:
