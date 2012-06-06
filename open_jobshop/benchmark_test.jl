@@ -1,7 +1,9 @@
+load("open_jobshop.jl")
+load("../evolib.jl") 
 load("benchmark_generator.jl")
-load("permutation_genetic.jl")
 load("hybrid_genetic.jl")
 load("selfish_gene.jl")
+load("permutation_genetic.jl")
 
 
 #
@@ -17,7 +19,8 @@ load("selfish_gene.jl")
 function benchmark_test()
 
     # Evaluation parameters:
-    num_runs = 100     # = 100 in paper
+    #num_runs = 100     # = 100 in paper
+    num_runs = 1     # = 100 in paper
     p_mutation  = 0.1 # = 0.1 in paper
     p_crossover = 0.6 # = 0.6 in paper
 
@@ -130,11 +133,12 @@ function benchmark_test()
         #1) Permutation Genetic:
         makespans = zeros(Int64, num_runs,1) # TODO: Is there a cheaper way to allocate an array?
         for j=1:num_runs
-            schedule= permutation_genetic(problem, probs, population_size, num_generations)
+            schedule = permutation_genetic(problem, probs, population_size, num_generations)
             makespans[j] = compute_makespan(schedule)
         end
         printf(" %6i | %6.1f |", min(makespans), mean(makespans))
 
+        #println("fu")
 
         # 2) Hybrid Genetic:
         makespans = zeros(Int64, num_runs,1) # TODO: Is there a cheaper way to allocate an array?

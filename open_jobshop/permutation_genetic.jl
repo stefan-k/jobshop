@@ -2,13 +2,13 @@
 # The permutation genetic algorithm from [Khuri] plus helper functions 
 #
 
-load("open_jobshop.jl")
-load("../evolib.jl")
+#load("open_jobshop.jl")
+#load("../evolib.jl")
 
 #
 # Prepare an OSSP problem for the genetic algorithm and run it
 #
-function permutation_genetic(problem::OpenJobShopProblem, probs::GeneticProbabilities, population_size, max_generations)
+function permutation_genetic(problem::OpenJobShopProblem, probs::GeneticProbabilities, population_size::Int, max_generations::Int)
 
     objective_function = (x) -> ( makespan_objective_function(problem, x) )
     num_genes = count_operations(problem)
@@ -20,7 +20,7 @@ function permutation_genetic(problem::OpenJobShopProblem, probs::GeneticProbabil
 
 end
 
-function permutation_genetic(problem::OpenJobShopProblem, population_size, max_generations)
+function permutation_genetic(problem::OpenJobShopProblem, population_size::Int, max_generations::Int)
 
     return permutation_genetic(problem, GeneticProbabilities(1.0,1.0,1.0,1.0), population_size, max_generations)
 
@@ -151,7 +151,7 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
         time_table = time_tables[op.machine]
         
         # Take first available time considering machine & job:
-        start_time = max((machine_times[op.machine], job_times[op.job_index]))
+        start_time = int(max((machine_times[op.machine], job_times[op.job_index])))
         time_table[start_time] = op # Reference to operation!
         
         # Update both times for the next op:

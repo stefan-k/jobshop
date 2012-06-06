@@ -2,8 +2,8 @@
 # The hybrid genetic algorithm from [Khuri] plus helper functions 
 #
 
-load("open_jobshop.jl")
-load("../evolib.jl")
+#load("open_jobshop.jl")
+#load("../evolib.jl")
 
 
 #
@@ -55,7 +55,11 @@ function hybrid_schedule_builder(problem::OpenJobShopProblem, chromosome::Chromo
 
     for index in job_indices
 
-        job_index = (index % length(unfinished_jobs)) + 1 # one-based indices
+        #job_index = (index % length(unfinished_jobs)) + 1 # one-based indices
+        # % has been changed from 'mod' to 'rem' which keeps the sign of 'index' 
+        # instead of 'length(unfinished_jobs)'
+        # TODO: index = -1: does this make sense?
+        job_index = mod(index, length(unfinished_jobs)) + 1 # one-based indices
         unfinished_operations = unfinished_jobs[job_index]
 
         # print("job ",job_index," {")
