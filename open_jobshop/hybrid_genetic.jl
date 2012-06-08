@@ -9,12 +9,15 @@
 #
 # Prepare an OSSP problem for the hybrid genetic algorithm and run it
 #
-function hybrid_genetic(problem::OpenJobShopProblem, probs::GeneticProbabilities, population_size, max_generations)
+function hybrid_genetic(problem::OpenJobShopProblem, 
+                        probs::GeneticProbabilities, population_size, 
+                        max_generations)
 
     objective_function = (x) -> ( hybrid_makespan(problem, x) )
     num_genes = count_operations(problem)
 
-    population = rand(Population, population_size, num_genes, objective_function)
+    population = rand(Population, population_size, num_genes, 
+                      objective_function)
     result = genetic(population, probs, max_generations, objective_function)
 
     return hybrid_schedule_builder(problem, result)
@@ -23,7 +26,8 @@ end
 
 # Short constructor:
 hybrid_genetic(problem::OpenJobShopProblem, population_size, max_generations) =
-    hybrid_genetic(problem, GeneticProbabilities(1.0,1.0,1.0,1.0), population_size, max_generations)
+    hybrid_genetic(problem, GeneticProbabilities(1.0,1.0,1.0,1.0), 
+    population_size, max_generations)
 
 
 function hybrid_makespan(problem::OpenJobShopProblem, population::Population)
@@ -32,11 +36,12 @@ function hybrid_makespan(problem::OpenJobShopProblem, population::Population)
     end
 end
 
-function hybrid_makespan(problem::OpenJobShopProblem, chromosome::Chromosome)
-    chromosome.fitness = compute_makespan(hybrid_schedule_builder(problem, chromosome))
+function hybrid_makespan(problem::OpenJobShopProblem, chr::Chromosome)
+    chr.fitness = compute_makespan(hybrid_schedule_builder(problem, chr))
 end
 
-function hybrid_schedule_builder(problem::OpenJobShopProblem, chromosome::Chromosome)
+function hybrid_schedule_builder(problem::OpenJobShopProblem, 
+                                 chromosome::Chromosome)
    
     # Take real-valued genes and round them
     # (Better would be implementing BitGene)
