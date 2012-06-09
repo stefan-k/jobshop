@@ -139,15 +139,15 @@ function benchmark_test()
 
         #1) Permutation Genetic:
         makespans = zeros(Int64, num_runs,1) 
+        schedule = RemoteRef[]
         if do_permutation
-            for j=1:num_runs
-                schedule = permutation_genetic(problem, probs, population_size, 
-                                               num_generations)
-                makespans[j] = compute_makespan(schedule)
+            for j = 1:num_runs
+                push(schedule, @spawn permutation_genetic(problem, probs, 
+                                                          population_size, 
+                                                          num_generations))
             end
-        else
-            for j=1:num_runs
-                makespans[j] = 0
+            for j = 1:num_runs
+                makespans[j] = compute_makespan(fetch(schedule[j]))
             end
         end
 
@@ -155,16 +155,16 @@ function benchmark_test()
 
         # 2) Hybrid Genetic:
         makespans = zeros(Int64, num_runs,1)
+        schedule = RemoteRef[]
         if do_hybrid
-            for j=1:num_runs
+            for j = 1:num_runs
                 #probs = GeneticProbabilities(p_mutation,p_crossover,0.0,0.0)
-                schedule= hybrid_genetic(problem, probs, population_size, 
-                                         num_generations)
-                makespans[j] = compute_makespan(schedule)
+                push(schedule, @spawn hybrid_genetic(problem, probs, 
+                                                     population_size, 
+                                                     num_generations))
             end
-        else
-            for j=1:num_runs
-                makespans[j] = 0
+            for j = 1:num_runs
+                makespans[j] = compute_makespan(fetch(schedule[j]))
             end
         end
         printf(" %4i | %6.1f |", min(makespans), mean(makespans))
@@ -172,16 +172,16 @@ function benchmark_test()
 
         # 3) Selfish Gene:
         makespans = zeros(Int64, num_runs,1)
+        schedule = RemoteRef[]
         if do_selfish
             for j=1:num_runs
                 #probs = GeneticProbabilities(p_mutation,p_crossover,0.0,0.0)
-                schedule = selfish_gene(problem, selfish_reward, selfish_stop, 
-                                        selfish_iterations) # TODO more parameters!
-                makespans[j] = compute_makespan(schedule)
+                push(schedule, @spawn selfish_gene(problem, selfish_reward, 
+                                                   selfish_stop, 
+                                                   selfish_iterations)) # TODO more parameters!
             end
-        else
-            for j=1:num_runs
-                makespans[j] = 0
+            for j = 1:num_runs
+                makespans[j] = compute_makespan(fetch(schedule[j]))
             end
         end
         printf(" %5i | %6.1f |\n", min(makespans), mean(makespans))
