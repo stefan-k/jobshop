@@ -185,7 +185,7 @@ end
 # e.g. if time==3 and two operations start at 5, both ops are returned.
 function next_operations(schedule::Schedule, time::Int64)
     next_per_machine = map(mingeq, schedule.time_tables, time)
-    next = find(next_per_machine == min(next_per_machine))
+    next = find(next_per_machine .== min(next_per_machine))
     
     return (next, next_per_machine[next][1])
 end

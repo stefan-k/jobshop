@@ -2,6 +2,8 @@
 # Generate a random problem and solve it using the permutation genetic algorithm 
 #
 
+load("open_jobshop.jl")
+load("../evolib.jl")
 load("permutation_genetic.jl")
 
 
@@ -15,7 +17,7 @@ problem = rand(OpenJobShopProblem, num_jobs, num_machines, max_duration)
 
 # Create initial schedule (just for comparison)
 dumb_schedule = Schedule(problem)
-initial_schedule = schedule_from_chromosome(problem, initial_chromosome(problem))
+initial_schedule = schedule_from_permutation_chromosome(problem, initial_chromosome(problem))
 
 # Solve
 println()

@@ -132,7 +132,7 @@ end
 #
 #  Create valid schedule from a permutation
 #
-function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
+function OLD_schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
     # The order of operations within a job is arbitrary!
     # An operation can be scheduled when the machine is ready *and* the previous op
     # from the same job has finished
@@ -160,6 +160,91 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
         # Update both times for the next op:
         machine_times[op.machine] = start_time + op.duration
         job_times[op.job_index]   = start_time + op.duration
+    end
+    
+    # Create Schedule object:
+    return Schedule(time_tables)
+end
+
+
+#
+#  Create valid schedule from a permutation
+#
+function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
+    # The order of operations within a job is arbitrary!
+    # An operation can be scheduled when the machine is ready *and* the previous op
+    # from the same job has finished
+
+    # Initilize:
+    op_map = generate_op_map(problem)
+    time_tables = TimeTable[]
+    machine_times = Int64[]
+    for i = 1:problem.num_machines
+        push(time_tables, TimeTable())
+        push(machine_times, 1)
+    end
+    job_times = ones(length(problem.jobs))
+
+    # Fill time tables:
+    for i = 1:length(chromosome.genes)
+        op_id = chromosome.genes[i].gene
+        op = op_map[op_id]
+        time_table = time_tables[op.machine]
+        
+        # Take first available time considering machine & job:
+        start_time = int(max((machine_times[op.machine], job_times[op.job_index])))
+        no_space = true 
+        for j in 1:start_time
+            for k = 1:start_time
+                if has(time_table, k)
+                    k_dur = time_table[k].duration
+                    if !((k >= j && k <= j + op.duration) || (k + k_dur >= j && k + k_dur <= j + op.duration)) &&
+                       !((j >= k && j <= k + k_dur) || (j + op.duration >= k && j + op.duration <= k + k_dur))
+                        mach_no_space = false 
+                        for l = 1:problem.num_machines
+                            if l == op.machine
+                                continue 
+                            end
+                            machine_table = time_tables[l]
+                            for m = 1:start_time
+                                if has(machine_table, m) && (op.job_index == machine_table[m].job_index)
+                                    m_dur = machine_table[m].duration
+                                    if m > j + op.duration
+                                        break
+                                    end
+                                    if (m >= j && m <= j + op.duration) || (m + m_dur >= j && m + m_dur <= j + op.duration) ||
+                                       (j >= m && j <= m + m_dur) || (j + op.duration >= m && j + op.duration <= m + m_dur)
+                                        mach_no_space = true
+                                        break
+                                    end
+                                end
+                            end
+                        end
+                        if mach_no_space == false
+                            no_space = false
+                            time_table[j] = op # Reference to operation!
+                            machine_times[op.machine] = max(machine_times[op.machine], j + op.duration)
+                            job_times[op.job_index] = max(job_times[op.job_index], j + op.duration)
+                            break
+                        end
+                    end
+                end
+            end
+            if no_space == false
+                break
+            end
+        end
+        if no_space == true 
+            time_table[start_time] = op # Reference to operation!
+            machine_times[op.machine] = start_time + op.duration
+            job_times[op.job_index]   = start_time + op.duration
+        end
+
+        #time_table[start_time] = op # Reference to operation!
+        
+        # Update both times for the next op:
+        #machine_times[op.machine] = start_time + op.duration
+        #job_times[op.job_index]   = start_time + op.duration
     end
     
     # Create Schedule object:
