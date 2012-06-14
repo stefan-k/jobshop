@@ -194,39 +194,37 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
         # Take first available time considering machine & job:
         start_time = int(max((machine_times[op.machine], job_times[op.job_index])))
         no_space = true 
-        for j in 1:start_time
-            for k = 1:start_time
-                if has(time_table, k)
-                    k_dur = time_table[k].duration
-                    if !((k >= j && k <= j + op.duration) || (k + k_dur >= j && k + k_dur <= j + op.duration)) &&
-                       !((j >= k && j <= k + k_dur) || (j + op.duration >= k && j + op.duration <= k + k_dur))
-                        mach_no_space = false 
-                        for l = 1:problem.num_machines
-                            if l == op.machine
-                                continue 
-                            end
-                            machine_table = time_tables[l]
-                            for m = 1:start_time
-                                if has(machine_table, m) && (op.job_index == machine_table[m].job_index)
-                                    m_dur = machine_table[m].duration
-                                    if m > j + op.duration
-                                        break
-                                    end
-                                    if (m >= j && m <= j + op.duration) || (m + m_dur >= j && m + m_dur <= j + op.duration) ||
-                                       (j >= m && j <= m + m_dur) || (j + op.duration >= m && j + op.duration <= m + m_dur)
-                                        mach_no_space = true
-                                        break
-                                    end
+        for j in 1:start_time # loop over all elements of current timetable to see if there is some free space
+            for k in keys(time_table) # loop over all already existing elements of the timetable and ...
+                k_dur = time_table[k].duration
+                if !((k >= j && k <= j + op.duration) || (k + k_dur >= j && k + k_dur <= j + op.duration)) &&
+                   !((j >= k && j <= k + k_dur) || (j + op.duration >= k && j + op.duration <= k + k_dur)) # ... check if fitting the operation at the current position would be a valid operation
+                    mach_no_space = false  # there obviously is some space, we just have to check if this collides ...
+                    for l = 1:problem.num_machines # ... with tasks of the same job on other machines
+                        if l == op.machine # do not check the machine where we want to place the task
+                            continue 
+                        end
+                        machine_table = time_tables[l] # get timetable of machine we want to check
+                        for m in keys(machine_table) # check all slots for collissions
+                            if op.job_index == machine_table[m].job_index # only check if it's the same job
+                                m_dur = machine_table[m].duration
+                                if m > j + op.duration # stopp loop if we are above slots where it makes sense to check
+                                    break
+                                end
+                                if (m >= j && m <= j + op.duration) || (m + m_dur >= j && m + m_dur <= j + op.duration) ||
+                                   (j >= m && j <= m + m_dur) || (j + op.duration >= m && j + op.duration <= m + m_dur) # check for collissions
+                                    mach_no_space = true
+                                    break # break if there is a collission
                                 end
                             end
                         end
-                        if mach_no_space == false
-                            no_space = false
-                            time_table[j] = op # Reference to operation!
-                            machine_times[op.machine] = max(machine_times[op.machine], j + op.duration)
-                            job_times[op.job_index] = max(job_times[op.job_index], j + op.duration)
-                            break
-                        end
+                    end
+                    if mach_no_space == false # add if there is space
+                        no_space = false
+                        time_table[j] = op # Reference to operation!
+                        machine_times[op.machine] = max(machine_times[op.machine], j + op.duration)
+                        job_times[op.job_index] = max(job_times[op.job_index], j + op.duration)
+                        break
                     end
                 end
             end
@@ -234,7 +232,7 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
                 break
             end
         end
-        if no_space == true 
+        if no_space == true  # append if it doesn't fit somewhere in 
             time_table[start_time] = op # Reference to operation!
             machine_times[op.machine] = start_time + op.duration
             job_times[op.job_index]   = start_time + op.duration
