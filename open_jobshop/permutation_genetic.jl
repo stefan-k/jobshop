@@ -197,6 +197,9 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
         for j in 1:start_time # loop over all elements of current timetable to see if there is some free space
             for k in keys(time_table) # loop over all already existing elements of the timetable and ...
                 k_dur = time_table[k].duration
+                if k > j + op.duration # stop looping if k is out of the range
+                    break
+                end
                 if !((k >= j && k <= j + op.duration) || (k + k_dur >= j && k + k_dur <= j + op.duration)) &&
                    !((j >= k && j <= k + k_dur) || (j + op.duration >= k && j + op.duration <= k + k_dur)) # ... check if fitting the operation at the current position would be a valid operation
                     mach_no_space = false  # there obviously is some space, we just have to check if this collides ...
@@ -217,6 +220,9 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
                                     break # break if there is a collission
                                 end
                             end
+                        end
+                        if mach_no_space == true
+                            break
                         end
                     end
                     if mach_no_space == false # add if there is space
