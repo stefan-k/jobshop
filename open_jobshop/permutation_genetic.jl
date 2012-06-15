@@ -195,7 +195,7 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
         start_time = int(max((machine_times[op.machine], job_times[op.job_index])))
         no_space = true 
         for j in 1:start_time # loop over all elements of current timetable to see if there is some free space
-            for k in keys(time_table) # loop over all already existing elements of the timetable and ...
+            for k in sort!(keys(time_table)) # loop over all already existing elements of the timetable and ...
                 k_dur = time_table[k].duration
                 if k > j + op.duration # stop looping if k is out of the range
                     break
@@ -208,7 +208,7 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
                             continue 
                         end
                         machine_table = time_tables[l] # get timetable of machine we want to check
-                        for m in keys(machine_table) # check all slots for collissions
+                        for m in sort!(keys(machine_table)) # check all slots for collissions
                             if op.job_index == machine_table[m].job_index # only check if it's the same job
                                 m_dur = machine_table[m].duration
                                 if m > j + op.duration # stopp loop if we are above slots where it makes sense to check
