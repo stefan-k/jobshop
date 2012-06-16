@@ -22,8 +22,8 @@ initial_schedule = OLD_schedule_from_permutation_chromosome(problem, initial_chr
 # Solve
 println()
 println("Solving...")
-population_size = 100
-max_generations = 100
+population_size = 200
+max_generations = 200
 @time optimal_schedule = permutation_genetic(problem, population_size, max_generations)
 
 

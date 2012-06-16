@@ -20,7 +20,7 @@ function benchmark_test()
 
     # Evaluation parameters:
     #num_runs = 100     # = 100 in paper
-    num_runs = 1     # = 100 in paper
+    num_runs = 10     # = 100 in paper
     p_mutation  = 0.1 # = 0.1 in paper
     p_crossover = 0.6 # = 0.6 in paper
 

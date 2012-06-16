@@ -200,8 +200,11 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
                 if k > j + op.duration # stop looping if k is out of the range
                     break
                 end
-                if !((k >= j && k <= j + op.duration) || (k + k_dur >= j && k + k_dur <= j + op.duration)) &&
-                   !((j >= k && j <= k + k_dur) || (j + op.duration >= k && j + op.duration <= k + k_dur)) # ... check if fitting the operation at the current position would be a valid operation
+                if k + k_dur < j # next loop if out of range
+                    continue
+                end
+                if !((k >= j && k <= (j + op.duration)) || ((k + k_dur) >= j && (k + k_dur) <= (j + op.duration))) &&
+                   !((j >= k && j <= (k + k_dur)) || ((j + op.duration) >= k && (j + op.duration) <= (k + k_dur))) # ... check if fitting the operation at the current position would be a valid operation
                     mach_no_space = false  # there obviously is some space, we just have to check if this collides ...
                     for l = 1:problem.num_machines # ... with tasks of the same job on other machines
                         if l == op.machine # do not check the machine where we want to place the task
@@ -214,8 +217,11 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
                                 if m > j + op.duration # stopp loop if we are above slots where it makes sense to check
                                     break
                                 end
-                                if (m >= j && m <= j + op.duration) || (m + m_dur >= j && m + m_dur <= j + op.duration) ||
-                                   (j >= m && j <= m + m_dur) || (j + op.duration >= m && j + op.duration <= m + m_dur) # check for collissions
+                                if m + m_dur < j
+                                    continue
+                                end
+                                if (m >= j && m <= (j + op.duration)) || ((m + m_dur) >= j && (m + m_dur) <= (j + op.duration)) ||
+                                   (j >= m && j <= (m + m_dur)) || ((j + op.duration) >= m && (j + op.duration) <= (m + m_dur)) # check for collissions
                                     mach_no_space = true
                                     break # break if there is a collission
                                 end
