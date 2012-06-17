@@ -4,6 +4,8 @@
 
 #load("open_jobshop.jl")
 #load("../evolib.jl")
+load("gaps.jl")
+    
 
 #
 # Prepare an OSSP problem for the genetic algorithm and run it
@@ -79,7 +81,7 @@ end
 #
 function schedule_from_chromosome(problem::OpenJobShopProblem, 
                                   chromosome::Chromosome)
-    return schedule_from_permutation_chromosome(problem, 
+    return permutation_schedule_builder(problem, 
                                   permutation_chromosome(chromosome))
 end
 
@@ -166,6 +168,49 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
     return Schedule(time_tables)
 end
 
+#
+# Try the same as below with gap lists:
+#
+function permutation_schedule_builder(problem::OpenJobShopProblem, chromosome)
+    pseudo_inf = 9999999
+    gap_lists = [ [Gap(1,pseudo_inf)] for i=1:count_jobs(problem),j=1:count_machines(problem) ]
+    
+    # Initilize:
+    op_map = generate_op_map(problem)
+    time_tables = TimeTable[]
+    for i = 1:problem.num_machines
+        push(time_tables, TimeTable())
+    end
+    
+    # Fill time tables:
+    for k = 1:length(chromosome.genes)
+        op_id = chromosome.genes[k].gene
+        op = op_map[op_id]
+        time_table = time_tables[op.machine]
+
+        gap_list = gap_lists[op.job_index, op.machine]
+        start_time = find_gap(gap_list, op.duration)
+        #println(start_time)
+
+        @assert start_time > 0
+        time_table[start_time] = op # Reference to operation!
+
+        gap = Gap(start_time, op.duration)
+        # The time slots this gap occupies have to be subtracted from the open gaps of job & machine:
+        # 1) for the job:
+        for i = 1:count_jobs(problem)
+            gap_lists[i, op.machine] = subtract(gap_lists[i, op.machine], gap)
+        end
+
+        for j = 1:count_machines(problem)
+            gap_lists[op.job_index, j] = subtract(gap_lists[op.job_index, j], gap)
+        end
+    end
+
+    # Create Schedule object:
+    return Schedule(time_tables)
+
+end
 
 #
 #  Create valid schedule from a permutation
