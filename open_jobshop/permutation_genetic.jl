@@ -81,7 +81,7 @@ end
 #
 function schedule_from_chromosome(problem::OpenJobShopProblem, 
                                   chromosome::Chromosome)
-    return permutation_schedule_builder(problem, 
+    return schedule_from_permutation_chromosome(problem, 
                                   permutation_chromosome(chromosome))
 end
 
