@@ -132,12 +132,12 @@ end
 #
 #  Create valid schedule from a permutation
 #
-function OLD_schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
+function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
     # The order of operations within a job is arbitrary!
     # An operation can be scheduled when the machine is ready *and* the previous op
     # from the same job has finished
 
-    # Initilize:
+    # Initialize:
     op_map = generate_op_map(problem)
     time_tables = TimeTable[]
     machine_times = Int64[]
@@ -170,7 +170,7 @@ end
 #
 #  Create valid schedule from a permutation
 #
-function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
+function NEW_schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chromosome)
     # The order of operations within a job is arbitrary!
     # An operation can be scheduled when the machine is ready *and* the previous op
     # from the same job has finished
