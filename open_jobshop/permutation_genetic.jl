@@ -195,17 +195,22 @@ function schedule_from_permutation_chromosome(problem::OpenJobShopProblem, chrom
         start_time = int(max((machine_times[op.machine], job_times[op.job_index])))
         no_space = true 
         for j in 1:start_time # loop over all elements of current timetable to see if there is some free space
+            # IDEA save sorted time table keys in vriable until it changes
             for k in sort!(keys(time_table)) # loop over all already existing elements of the timetable and ...
                 k_dur = time_table[k].duration
-                if k > j + op.duration # stop looping if k is out of the range
+                if k > (j + op.duration) # stop looping if k is out of the range
                     break
                 end
-                if k + k_dur < j # next loop if out of range
+                if (k + k_dur) < j # next loop if out of range
                     continue
                 end
                 if !((k >= j && k <= (j + op.duration)) || ((k + k_dur) >= j && (k + k_dur) <= (j + op.duration))) &&
                    !((j >= k && j <= (k + k_dur)) || ((j + op.duration) >= k && (j + op.duration) <= (k + k_dur))) # ... check if fitting the operation at the current position would be a valid operation
                     mach_no_space = false  # there obviously is some space, we just have to check if this collides ...
+                    
+                    #M = op.machines
+                    #for l = [1:M-1, M+1:problem.num_machines] #exclude current machine
+
                     for l = 1:problem.num_machines # ... with tasks of the same job on other machines
                         if l == op.machine # do not check the machine where we want to place the task
                             continue 
