@@ -1,6 +1,6 @@
 type Gap
-    start
-    size
+    start::Int64
+    size::Int64
 end
 
 typealias GapList Vector{Gap}
@@ -12,50 +12,48 @@ fin(gap::Gap) = gap.start + gap.size
 isless(gap1::Gap, gap2::Gap) = isless(gap1.start, gap2.start)
 
 
+#
+# NOT USED
+#
+# function intersect(gaps1::GapList, gaps2::GapList)
 
-# Unite overlapping gaps:
-#function glue!(gaps::Vector{Gap})
-
-function intersect(gaps1::GapList, gaps2::GapList)
-
-    gaps = Gap[]
+#     gaps = Gap[]
     
-    for gap1 in gaps1
-        for gap2 in gaps2
-            # Case 1
-            # 1 -------oooo--
-            # 2 -ooo---------
-            if gap1.start >= fin(gap2)
-                continue
-            # Case 2
-            # 1 -oooo--------
-            # 2 -------ooo---
-            elseif gap2.start >= fin(gap1)
-                break # gaps are sorted, so no need to continue
-            else
+#     for gap1 in gaps1
+#         for gap2 in gaps2
+#             # Case 1
+#             # 1 -------oooo--
+#             # 2 -ooo---------
+#             if gap1.start >= fin(gap2)
+#                 continue
+#             # Case 2
+#             # 1 -oooo--------
+#             # 2 -------ooo---
+#             elseif gap2.start >= fin(gap1)
+#                 break # gaps are sorted, so no need to continue
+#             else
 
-                start = max([gap1.start, gap2.start])
-                after = min([fin(gap1), fin(gap2)])
-                size = after - start
+#                 start = max([gap1.start, gap2.start])
+#                 after = min([fin(gap1), fin(gap2)])
+#                 size = after - start
 
-                push(gaps, Gap(start, size))
-            end
+#                 push(gaps, Gap(start, size))
+#             end
 
-        end # loop over gaps2
-    end # loop over gaps1
+#         end # loop over gaps2
+#     end # loop over gaps1
 
-    sort!(gaps)
-    return gaps
-end
+#     sort!(gaps)
+#     return gaps
+# end
+
 
 # Subtract a gap from a gap list, meaning gaps will be closed, e.g.
-
 #----ooooo----
 # -
 #-----oo------
 # =
 #----o--oo----
-
 function subtract(gaps::GapList, gap::Gap)
 
     new_gaps = Gap[]
