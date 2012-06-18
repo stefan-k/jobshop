@@ -18,9 +18,9 @@ function hybrid_genetic(problem::OpenJobShopProblem,
 
     population = rand(Population, population_size, num_genes, 
                       objective_function)
-    result = genetic(population, probs, max_generations, objective_function)
+    result, convergence = genetic(population, probs, max_generations, objective_function)
 
-    return hybrid_schedule_builder(problem, result)
+    return hybrid_schedule_builder(problem, result), convergence
 
 end
 

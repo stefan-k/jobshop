@@ -18,9 +18,9 @@ function permutation_genetic(problem::OpenJobShopProblem,
     num_genes = count_operations(problem)
 
     population = rand(Population, population_size, num_genes, objective_function)
-    result = genetic(population, probs, max_generations, objective_function)
+    result, convergence = genetic(population, probs, max_generations, objective_function)
 
-    return schedule_from_chromosome(problem, result)
+    return schedule_from_chromosome(problem, result), convergence
 
 end
 

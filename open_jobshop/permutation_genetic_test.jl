@@ -24,7 +24,7 @@ println()
 println("Solving...")
 population_size = 200
 max_generations = 200
-@time optimal_schedule = permutation_genetic(problem, population_size, max_generations)
+@time optimal_schedule, convergence = permutation_genetic(problem, population_size, max_generations)
 
 
 # Output

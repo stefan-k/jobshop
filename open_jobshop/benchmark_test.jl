@@ -19,8 +19,8 @@ load("permutation_genetic.jl")
 function benchmark_test()
 
     # Evaluation parameters:
-    num_runs = 100     # = 100 in paper
-    #num_runs = 10     # = 100 in paper
+    #num_runs = 100     # = 100 in paper
+    num_runs = 10     # = 100 in paper
     p_mutation  = 0.1 # = 0.1 in paper
     p_crossover = 0.6 # = 0.6 in paper
 
@@ -77,11 +77,11 @@ function benchmark_test()
 #7  7  99  122574075   10979313
 #7  7  99  248031774   1685251301
 
-10 10 99 1344106948 ￼ ￼ ￼ ￼ 1868311537 ￼ ￼ ￼ 
-10 10 99  425990073 ￼ ￼ ￼ ￼ 1111853152 ￼ 
-10 10 99  666128954 ￼ ￼ ￼ ￼ 1750328066 ￼ ￼
-10 10 99  442723456 ￼ ￼ ￼ ￼ 1369177184 ￼ ￼ ￼
-10 10 99 2033800800 ￼ ￼ ￼ ￼ 1344077538
+10 10 99 1344106948 1868311537
+10 10 99  425990073 1111853152
+10 10 99  666128954 1750328066
+10 10 99  442723456 1369177184
+10 10 99 2033800800 1344077538
 
 15 15 99  1561423441  1787167667 
 15 15 99  204120997   213027331 
@@ -153,7 +153,8 @@ function benchmark_test()
                                                           num_generations))
             end
             for j = 1:num_runs
-                makespans[j] = compute_makespan(fetch(schedule[j]))
+                optimal_schedule, perm_conv = fetch(schedule[j])
+                makespans[j] = compute_makespan(optimal_schedule)
             end
         end
 
@@ -170,7 +171,9 @@ function benchmark_test()
                                                      num_generations))
             end
             for j = 1:num_runs
-                makespans[j] = compute_makespan(fetch(schedule[j]))
+                optimal_schedule, perm_conv = fetch(schedule[j])
+                #makespans[j] = compute_makespan(fetch(schedule[j]))
+                makespans[j] = compute_makespan(optimal_schedule)
             end
         end
         printf(" %4i | %6.1f |", min(makespans), mean(makespans))

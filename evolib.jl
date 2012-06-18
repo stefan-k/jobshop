@@ -711,6 +711,7 @@ function genetic(pop::Population, probabilities::GeneticProbabilities,
     
     best = pop_o[1]
     best_generation = 0
+    convergence = zeros(Float, iter)
     for j = 1:iter # max generations
         pop_n = Population(length(pop_o))
         operations = [roulette(probabilities) for i in 1:length(pop_o)]
@@ -733,6 +734,7 @@ function genetic(pop::Population, probabilities::GeneticProbabilities,
         sort!(pop_n)
 
         #print(pop_n[1].fitness) # TODO: print if debug flag
+        convergence[j] = pop_n[1].fitness
         
         # Store best chromosome (don't know if the original algo does this as well)
         if pop_n[1].fitness < best.fitness
@@ -748,7 +750,7 @@ function genetic(pop::Population, probabilities::GeneticProbabilities,
 
     #println("Genetic algorithm found best solution w/ fitness $(best.fitness) in generation $best_generation.")
 
-    return best
+    return best, convergence
 end
 
 ################################################################################
