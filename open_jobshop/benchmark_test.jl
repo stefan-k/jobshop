@@ -27,7 +27,7 @@ function plot_convergence(convergence::Array{Float64,2}, prefix::String, width::
     for i = 1:num_runs
         add(p, Curve(1:num_generations, squeeze(convergence[i,:])))
     end
-    add(p, Curve(1:num_generations, squeeze(mean(convergence, 1)), "width", 3, "color", "red"))
+    add(p, Curve(1:num_generations, squeeze(mean(convergence, 1)), "width", 5, "color", "red"))
     write_pdf(p, "$(prefix)_$(num_generations).pdf", float(width), float(height))
 end
 
