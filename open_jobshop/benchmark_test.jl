@@ -55,7 +55,7 @@ function benchmark_test()
     # Convergence information
     perm_conv = zeros(Float64, (num_runs, num_generations))
     hyb_conv = zeros(Float64, (num_runs, num_generations))
-    sg_conv = zeros(Float64, (num_runs, num_generations))
+    sg_conv = zeros(Float64, (num_runs, selfish_iterations))
 
     # Choose which algorithms to perform
     do_permutation = true
@@ -220,7 +220,12 @@ function benchmark_test()
                                                    selfish_iterations)) # TODO more parameters!
             end
             for j = 1:num_runs
-                makespans[j] = compute_makespan(fetch(schedule[j]))
+                optimal_schedule, sg_conv[j,:] = fetch(schedule[j])
+                makespans[j] = compute_makespan(optimal_schedule)
+            end
+            #println(sg_conv)
+            if do_plot
+                plot_convergence(sg_conv, "output/slf_$(b[1])_$(i2)", 1024, 1024)
             end
         end
         printf(" %5i | %6.1f |\n", min(makespans), mean(makespans))
