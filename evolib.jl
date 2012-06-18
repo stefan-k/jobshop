@@ -734,15 +734,14 @@ function genetic(pop::Population, probabilities::GeneticProbabilities,
         sort!(pop_n)
 
         #print(pop_n[1].fitness) # TODO: print if debug flag
-        convergence[j] = pop_n[1].fitness
         
         # Store best chromosome (don't know if the original algo does this as well)
         if pop_n[1].fitness < best.fitness
             best = pop_n[1]
-            #print("*")
             best_generation = j
         end
-        #println()
+
+        convergence[j] = best.fitness
 
         #gen + pop_n
         pop_o = copy(pop_n)

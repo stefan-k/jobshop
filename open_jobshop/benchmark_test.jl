@@ -1,3 +1,7 @@
+#
+# This evaluation script attempts to display the same test cases as in the [Khuri] paper
+#
+
 load("open_jobshop.jl")
 load("../evolib.jl") 
 load("benchmark_generator.jl")
@@ -5,22 +9,36 @@ load("hybrid_genetic.jl")
 load("selfish_gene.jl")
 load("permutation_genetic.jl")
 
+do_plot = true
 
-#
-# This evaluation script attempts to display the same test cases as in the [Khuri] paper
-#
-
+if do_plot
+    load("winston.jl")
+end
 
 # TODO Parameters:
 # * Selfish: mut 0.1, reward 0.4, 10000 computations or 95% on every locus
 # * Run 100 times -> mean!
 
+function plot_convergence(convergence::Array{Float64,2}, prefix::String, width::Number, height::Number)
+    p = FramedPlot()
+    setattr(p.x1, "label", "Generation")
+    setattr(p.y1, "label", "Makespan")
+    num_runs, num_generations = size(convergence)
+    for i = 1:num_runs
+        add(p, Curve(1:num_generations, squeeze(convergence[i,:])))
+    end
+    add(p, Curve(1:num_generations, squeeze(mean(convergence, 1)), "width", 3, "color", "red"))
+    write_pdf(p, "$(prefix)_$(num_generations).pdf", float(width), float(height))
+end
+
+plot_convergence(convergence, prefix) = plot_convergence(convergence, prefix, 512, 512)
+
 # TEST CASE:
 function benchmark_test()
 
     # Evaluation parameters:
-    #num_runs = 100     # = 100 in paper
-    num_runs = 10     # = 100 in paper
+    num_runs = 100     # = 100 in paper
+    #num_runs = 10     # = 100 in paper
     p_mutation  = 0.1 # = 0.1 in paper
     p_crossover = 0.6 # = 0.6 in paper
 
@@ -33,6 +51,11 @@ function benchmark_test()
     selfish_iterations = 10000 # = 10 000 in paper
     selfish_reward = 0.04      # = 0.04 in paper
     selfish_stop = .95         # = .95 in paper
+
+    # Convergence information
+    perm_conv = zeros(Float64, (num_runs, num_generations))
+    hyb_conv = zeros(Float64, (num_runs, num_generations))
+    sg_conv = zeros(Float64, (num_runs, num_generations))
 
     # Choose which algorithms to perform
     do_permutation = true
@@ -153,8 +176,11 @@ function benchmark_test()
                                                           num_generations))
             end
             for j = 1:num_runs
-                optimal_schedule, perm_conv = fetch(schedule[j])
+                optimal_schedule, perm_conv[j,:] = fetch(schedule[j])
                 makespans[j] = compute_makespan(optimal_schedule)
+            end
+            if do_plot
+                plot_convergence(perm_conv, "output/perm_$(b[1])_$(i2)", 1024, 1024)
             end
         end
 
@@ -171,12 +197,16 @@ function benchmark_test()
                                                      num_generations))
             end
             for j = 1:num_runs
-                optimal_schedule, perm_conv = fetch(schedule[j])
+                optimal_schedule, hyb_conv[j,:] = fetch(schedule[j])
                 #makespans[j] = compute_makespan(fetch(schedule[j]))
                 makespans[j] = compute_makespan(optimal_schedule)
             end
+            if do_plot
+                plot_convergence(hyb_conv, "output/hyb_$(b[1])_$(i2)", 1024, 1024)
+            end
         end
         printf(" %4i | %6.1f |", min(makespans), mean(makespans))
+
 
 
         # 3) Selfish Gene:
@@ -194,7 +224,6 @@ function benchmark_test()
             end
         end
         printf(" %5i | %6.1f |\n", min(makespans), mean(makespans))
-    
     end
 
 
