@@ -1,0 +1,11 @@
+*.aux
+*.swp
+*.log
+*.idx
+*.pdf
+*.nav
+*.vrb
+*.toc
+*.snm
+*.out
+*.svg

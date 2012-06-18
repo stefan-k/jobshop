@@ -1,0 +1,244 @@
+% Template from latex.tugraz.at
+
+\documentclass[%
+%handout, % prints handouts (=no animations, for printed version)
+%mathserif
+%xcolor=pst,
+14pt
+% fleqn
+]{beamer}
+
+\usepackage{beamerthemedefault}
+
+\useoutertheme[subsection=false]{smoothbars}
+\useinnertheme[shadow=true]{rounded}
+
+\setbeamercolor{block title}{fg=black,bg=gray}
+\setbeamercolor{block title alerted}{use=alerted text,fg=black,bg=alerted text.fg!75!bg}
+\setbeamercolor{block title example}{use=example text,fg=black,bg=example text.fg!75!bg}
+\setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!25!bg}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title alerted.bg!25!bg}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=block title example.bg!25!bg}
+
+%% for including video/audio
+%\usepackage{multimedia} %needs hyperref-package
+
+%% aktive Referenzen
+\usepackage{hyperref}
+
+\usepackage{ngerman}			% language set to new-german
+\usepackage[utf8]{inputenc} 	% coding of german special characters
+% \usepackage{ae,aecompl}
+% \usepackage{amsmath,amssymb,amstext} 	% support for mathematics
+
+% \usepackage{listings}		% include programming code
+%\usepackage{amsfonts}		% blackboard fonts: $\mathbb{N,Z,R,C,...}$
+%\usepackage{latexsym}
+%\usepackage{textcomp}
+%\usepackage{mathptmx,courier}
+			% \textdegree \textcelsius \textperthousand
+			% \copyright \texttrademark \textregistered
+			% \textmu (non-italic mu)
+%\usepackage{geometry}	% change paper dimension an margins
+%    \geometry{verbose,paperwidth=128mm,paperheight=90mm}
+%    \geometry{tmargin=0mm,bmargin=0mm,lmargin=10mm,rmargin=10mm}
+%\usepackage{graphicx}  % \includegraphics[options]{file.eps}
+			% options = scale, width, totalheight, height, depth,
+			% angle = deg, origin = {l c r}{top, Baseline, bottom}
+			% \scalebox{h-scale}[v-scale]{object}
+			% \rotatebox[x=xdim,y=ydim]{angleCCW}[object}
+%\usepackage{tabularx}	% \begin{tabular}{...X...} stretches column
+%\usepackage{multirow}
+%\usepackage{floatflt}
+%\usepackage{hhline}
+%\usepackage{colortbl}
+\usepackage{array}
+\usepackage{setspace}
+
+%\usepackage[thinspace,thinqspace,squaren,textstyle]{SIunits}
+
+\definecolor{tug}{rgb}{0.96862,0.14509,0.27450}
+
+\setbeamertemplate{headline}[text line]{
+	\begin{beamercolorbox}[wd=\paperwidth,ht=8ex,dp=4ex]{}
+		\insertnavigation{0.85\paperwidth} 
+		\raisebox{-10pt}{\includegraphics[width=15mm]{tuglogo}}\vskip2pt
+		\hskip-1pt\rule{\paperwidth}{0.3pt}
+	\end{beamercolorbox}
+}
+
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{gray}{rgb}{0.8,0.8,0.8}
+\setbeamercolor{footline}{fg=black,bg=gray}
+
+% Fußzeile mit Autor, Titel und Foliennummer / Gesamtfolienzahl
+\setbeamertemplate{footline}[text line]{
+	\hskip-1pt
+	\begin{beamercolorbox}[wd=\paperwidth]{footline}
+			\rule{\paperwidth}{0.3pt}
+			\colorbox{tug}{\rule{3pt}{0pt}\rule{0pt}{3pt}}
+			\textbf{\rule{0pt}{5pt}\insertshortauthor\hfill\insertshortinstitute\hfill%
+					\insertshorttitle\rule{1em}{0pt}}
+			\rule{\paperwidth}{0.3pt}
+	\end{beamercolorbox}
+	\begin{beamercolorbox}[wd=\paperwidth,ht=2ex,dp=2ex]{white}
+	\end{beamercolorbox}
+}%
+
+%% Titelblatt-Einstellungen
+\title{Implementation of an Evolutionary Optimization Framework and Application to the Open Job Shop Problem}
+%\subtitle{}
+\author{Joris Bayer, Stefan Kroboth}
+% \date{}		% wenn ein anderes als das heutige Datum eingesetzt werden soll
+
+% Subject und Keywords für PDF-Datei
+\subject{Implementation of an Evolutionary Optimization Framework and Application to the Open Job Shop Problem}
+\keywords{Numerical Optimization, Evolutionary Algorithms, Open Job Shop Problem}
+
+\titlegraphic{\includegraphics[width=20mm]{tuglogo}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[plain]
+  \frametitle{}
+  \titlepage % erzeugt Titelseite
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Inhalt}
+        \tableofcontents[hideallsubsections %
+                        % ,pausesections
+                        ] % erzeugt Inhaltsverzeichnis
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Beispiele}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Aufzählungen}
+\begin{frame}
+	\frametitle{Aufzählungen erstellen}
+	\begin{spacing}{1.5}
+	\begin{itemize}
+		\item Punkt 1
+		\begin{itemize}
+			\item Unterpunkt 1
+			\item Unterpunkt 2
+		\end{itemize}
+		\item Punkt 2
+		\item Punkt 3
+	\end{itemize}
+	\end{spacing}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Blöcke}
+\begin{frame}
+	\frametitle{Blöcke}
+	\framesubtitle{Normale Blöcke}
+	\begin{block}{Normaler Block}
+		Das ist ein Block mit einer Formel
+		\begin{eqnarray*}
+		u(x,t) & = & \sum_{k=1}^{\infty} f_k \sin \frac{k \pi x}{L} \cos 
+					 \frac{k \pi t}{aL} + \\
+			   & + & \sum_{k=1}^{\infty} g_k \sin \frac{k \pi x}{L} \sin 
+					 \frac{k \pi t}{aL} \\
+		\end{eqnarray*}
+	\end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+	\frametitle{Blöcke}
+	\framesubtitle{Beispiel-Blöcke}
+	\begin{exampleblock}{Beispiel-Block}
+	\begin{semiverbatim}
+SUCHE (A,x)
+1: i = 0
+2: WHILE i<n
+3:     i = i+1
+4:     \alert{IF A[i]=x THEN RETURN i}
+5: ELSE RETURN -1
+	\end{semiverbatim}
+	\end{exampleblock}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+	\frametitle{Blöcke}
+	\framesubtitle{Alert-Blöcke}
+	\Large
+	\begin{alertblock}{Alert-Block}
+		\centering
+		Achtung! Nicht zu viel Inhalt auf eine Folie!
+	\end{alertblock}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Spalten und Grafiken}
+\begin{frame}
+	\frametitle{Spalten und Grafiken}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			Aufzählung in Spalte 1
+			\begin{enumerate}
+				\item Punkt 1
+				\item Punkt 2
+				\item Punkt 3
+			\end{enumerate}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{center}
+			%\includegraphics[width=0.4\textwidth]{smail}
+
+			Grafik in Spalte 2
+			\end{center}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Abschnitt 2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Abschnitt 3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Zusammenfassung}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+	\frametitle{Zusammenfassung}
+	\begin{itemize}
+		\item Punkt 1
+		\item Punkt 2
+		\item Punkt 3
+	\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{} % Damit die Kontakt-Folie nicht im Inhaltsverzeichnis aufscheint
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Kontakt}
+nothing
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% EOF
