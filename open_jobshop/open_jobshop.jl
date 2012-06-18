@@ -279,15 +279,21 @@ load("gaps.jl")
 
 type OpenJobShopScheduler # Name 'Scheduler' was taken
 
-    gap_lists   ::  Array{GapList,2}
-    time_tables ::  Vector{TimeTable}
+    num_jobs        ::  Int64
+    num_machines    ::  Int64
+    gap_lists       ::  Array{GapList,2}
+    time_tables     ::  Vector{TimeTable}
 
     function OpenJobShopScheduler(problem::OpenJobShopProblem)
+
+        num_jobs = count_jobs(problem)
+        num_machines = count_machines(problem)
+
         time_tables = [ TimeTable() for i=1:problem.num_machines ]
         pseudo_inf = 999999999999
-        gap_lists = [ [Gap(1,pseudo_inf)] for i=1:count_jobs(problem),j=1:count_machines(problem) ]
+        gap_lists = [ [Gap(1,pseudo_inf)] for i=1:num_jobs,j=1:num_machines ]
     
-        new(gap_lists, time_tables)
+        new(num_jobs, num_machines, gap_lists, time_tables)
     end
 
 end
@@ -305,11 +311,11 @@ function schedule_operation(scheduler::OpenJobShopScheduler, op::Operation)
     gap = Gap(start_time, op.duration)
     # The time slots this gap occupies have to be subtracted from the open gaps of job & machine:
     # 1) for the job:
-    for i = 1:count_jobs(problem)
+    for i = 1:scheduler.num_jobs
         scheduler.gap_lists[i, op.machine] = subtract(scheduler.gap_lists[i, op.machine], gap)
     end
 
-    for j = 1:count_machines(problem)
+    for j = 1:scheduler.num_machines
         scheduler.gap_lists[op.job_index, j] = subtract(scheduler.gap_lists[op.job_index, j], gap)
     end
 end

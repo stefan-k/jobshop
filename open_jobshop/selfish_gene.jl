@@ -209,9 +209,7 @@ function selfish_schedule_builder(problem::OpenJobShopProblem, chromosome::Chrom
     unfinished_jobs = [ copy(problem.jobs[i].operations) for i=1:num_jobs ]
 
     # Initialize timetables:
-    job_times = ones(num_jobs)
-    machine_times = ones(num_machines)
-    time_tables = [ TimeTable(num_jobs) for i=1:num_machines ]
+    scheduler = OpenJobShopScheduler(problem)
 
     for i =1:2:length(indices)
 
@@ -221,15 +219,8 @@ function selfish_schedule_builder(problem::OpenJobShopProblem, chromosome::Chrom
 
         op = unfinished_operations[machine]
 
-        # Take first available time considering machine & job:
-        time_table = time_tables[op.machine]
-        start_time = max((machine_times[op.machine], job_times[op.job_index]))
-        time_table[start_time] = op # Reference to operation!
+        schedule_operation(scheduler, op)
         
-        # Update both times for the next op:
-        machine_times[op.machine] = start_time + op.duration
-        job_times[op.job_index]   = start_time + op.duration
-
         # Remove operation from unfinished:
         del(unfinished_operations, machine)
         if isempty(unfinished_operations)
@@ -237,5 +228,5 @@ function selfish_schedule_builder(problem::OpenJobShopProblem, chromosome::Chrom
         end
     end
 
-   return Schedule(time_tables)
+   return create_schedule(scheduler)
 end

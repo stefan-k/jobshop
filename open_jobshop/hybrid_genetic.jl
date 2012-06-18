@@ -54,9 +54,12 @@ function hybrid_schedule_builder(problem::OpenJobShopProblem,
     unfinished_jobs = [ sortr(problem.jobs[i].operations) for i=1:num_jobs ]
 
     # Initialize timetables:
-    job_times = ones(num_jobs)
-    machine_times = ones(num_machines)
-    time_tables = [ TimeTable(num_jobs) for i=1:num_machines ]
+    #job_times = ones(num_jobs)
+    #machine_times = ones(num_machines)
+    
+    #time_tables = [ TimeTable(num_jobs) for i=1:num_machines ]
+
+    scheduler = OpenJobShopScheduler(problem)
 
     for index in job_indices
 
@@ -78,14 +81,15 @@ function hybrid_schedule_builder(problem::OpenJobShopProblem,
         op = unfinished_operations[1]
 
         # Schedule longest:
+        schedule_operation(scheduler, op)
         # Take first available time considering machine & job:
-        time_table = time_tables[op.machine]
-        start_time = max((machine_times[op.machine], job_times[op.job_index]))
-        time_table[start_time] = op # Reference to operation!
+        #time_table = time_tables[op.machine]
+        #start_time = max((machine_times[op.machine], job_times[op.job_index]))
+        #time_table[start_time] = op # Reference to operation!
         
         # Update both times for the next op:
-        machine_times[op.machine] = start_time + op.duration
-        job_times[op.job_index]   = start_time + op.duration
+        #machine_times[op.machine] = start_time + op.duration
+        #job_times[op.job_index]   = start_time + op.duration
 
         # Remove operation from unfinished:
         del(unfinished_operations, 1)
@@ -95,5 +99,5 @@ function hybrid_schedule_builder(problem::OpenJobShopProblem,
     end
 
 
-   return Schedule(time_tables)
+   return create_schedule(scheduler)
 end

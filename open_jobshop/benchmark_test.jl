@@ -9,7 +9,7 @@ load("hybrid_genetic.jl")
 load("selfish_gene.jl")
 load("permutation_genetic.jl")
 
-do_plot = true
+do_plot = false
 
 if do_plot
     load("winston.jl")
@@ -37,7 +37,7 @@ plot_convergence(convergence, prefix) = plot_convergence(convergence, prefix, 51
 function benchmark_test()
 
     # Evaluation parameters:
-    num_runs = 100     # = 100 in paper
+    num_runs = 1     # = 100 in paper
     #num_runs = 10     # = 100 in paper
     p_mutation  = 0.1 # = 0.1 in paper
     p_crossover = 0.6 # = 0.6 in paper
