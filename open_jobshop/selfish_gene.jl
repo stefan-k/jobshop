@@ -107,6 +107,8 @@ function selfish_gene(problem::OpenJobShopProblem, reward_step, stop, max_iter)
     
     vp = VirtualPopulation(sizes)
     best_sofar = choose_chromosome(vp)
+
+    convergence = zeros(Float, max_iter)
     
     for i = 1:max_iter
 
@@ -142,11 +144,13 @@ function selfish_gene(problem::OpenJobShopProblem, reward_step, stop, max_iter)
             best_sofar = winner
         end
 
-    end
+        convergence[i] = fitness(winner)
+
+    end #loop
 
     #println()
 
-    return selfish_schedule_builder(problem, best_sofar)
+    return selfish_schedule_builder(problem, best_sofar), convergence
 
 end
 
