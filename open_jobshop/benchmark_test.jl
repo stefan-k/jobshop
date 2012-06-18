@@ -45,7 +45,7 @@ function benchmark_test()
     
     # Parameters for the genetic algorithms (PGA):
     population_size = 200 # = 200 in paper
-    num_generations = 200 # = 200 in paper
+    num_generations = 200 # = 500 in paper
 
 
     selfish_iterations = 10000 # = 10 000 in paper
@@ -58,8 +58,8 @@ function benchmark_test()
     sg_conv = zeros(Float64, (num_runs, selfish_iterations))
 
     # Choose which algorithms to perform
-    do_permutation = true
-    do_hybrid = true
+    do_permutation = false
+    do_hybrid = false
     do_selfish = true
 
 

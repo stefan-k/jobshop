@@ -36,10 +36,10 @@ end
 #
 # The threshold was chosen empirically.
 #
-steady_state(vp::VirtualPopulation, stop) = ( mean_max(vp) > stop)
+steady_state(vp::VirtualPopulation, stop) = ( minmax(vp) >= stop)
 
 # Helper function for steady state
-mean_max(vp::VirtualPopulation) = mean([ max(locus) for locus in vp.probabilities ])
+minmax(vp::VirtualPopulation) = min([ max(locus) for locus in vp.probabilities ])
 
 
 #
@@ -132,6 +132,7 @@ function selfish_gene(problem::OpenJobShopProblem, reward_step, stop, max_iter)
         punish(vp, loser , 1+reward_step)
 
         # Check if the virtual pop. is steady:
+        #println(minmax(vp))
         if steady_state(vp, stop)
             #println()
             #println("  Population reached steady state at iteration ", i)
