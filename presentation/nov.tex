@@ -163,14 +163,25 @@
   \end{itemize}
 \end{frame}
 
+\subsection{Algorithms}
 \begin{frame}
   \frametitle{Algorithms}
+  \begin{spacing}{1.5}
+    \begin{itemize}
+      \item Implemented as displayed in the lecture notes:
+        \begin{itemize}
+          \item Genetic Algorithm
+          \item (1+1) Evolutionary Strategy
+          \item $(\mu/\rho, \lambda)$ Evolutionary Strategy
+        \end{itemize}
+    \end{itemize}
+  \end{spacing}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Example}
   %\begin{exampleblock}{Beispiel-Block}
-  \vspace{-0.8cm}
+  \vspace{-0.5cm}
 {\scriptsize
 \begin{verbatim}
 load("evolib.jl")
@@ -190,7 +201,8 @@ end
 
 popul = rand(Population, 100, 2, rosenbrock, 1.0, 6.0, -6.0 )
 
-@time evo_slash(popul, 2, 150, 1000, 0.85, 0.0000001, rosenbrock)
+@time best = evo_slash(popul, 2, 150, 1000, 0.85, 0.0000001, rosenbrock)
+print(best)
 
 \end{verbatim}}
   %\end{exampleblock}
