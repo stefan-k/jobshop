@@ -1,0 +1,12 @@
+*.aux
+*.swp
+*.log
+*.idx
+nov.pdf
+main.pdf
+*.nav
+*.vrb
+*.toc
+*.snm
+*.out
+*.svg
