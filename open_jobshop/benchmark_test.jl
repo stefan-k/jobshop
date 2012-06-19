@@ -9,7 +9,7 @@ load("hybrid_genetic.jl")
 load("selfish_gene.jl")
 load("permutation_genetic.jl")
 
-do_plot = false
+do_plot = true
 
 if do_plot
     load("winston.jl")
@@ -19,11 +19,12 @@ end
 # * Selfish: mut 0.1, reward 0.4, 10000 computations or 95% on every locus
 # * Run 100 times -> mean!
 
-function plot_convergence(convergence::Array{Float64,2}, prefix::String, width::Number, height::Number)
+function plot_convergence(convergence::Array{Float64,2}, prefix::String, lower_bound::Number, width::Number, height::Number)
     p = FramedPlot()
     setattr(p.x1, "label", "Generation")
     setattr(p.y1, "label", "Makespan")
     num_runs, num_generations = size(convergence)
+    add(p, LineY(lower_bound, "type", "dot"))
     for i = 1:num_runs
         add(p, Curve(1:num_generations, squeeze(convergence[i,:])))
     end
@@ -31,13 +32,13 @@ function plot_convergence(convergence::Array{Float64,2}, prefix::String, width::
     write_pdf(p, "$(prefix)_$(num_generations).pdf", float(width), float(height))
 end
 
-plot_convergence(convergence, prefix) = plot_convergence(convergence, prefix, 512, 512)
+plot_convergence(convergence, prefix, lb) = plot_convergence(convergence, prefix, lb, 512, 512)
 
 # TEST CASE:
 function benchmark_test()
 
     # Evaluation parameters:
-    num_runs = 1     # = 100 in paper
+    num_runs = 100     # = 100 in paper
     #num_runs = 10     # = 100 in paper
     p_mutation  = 0.1 # = 0.1 in paper
     p_crossover = 0.6 # = 0.6 in paper
@@ -58,8 +59,8 @@ function benchmark_test()
     sg_conv = zeros(Float64, (num_runs, selfish_iterations))
 
     # Choose which algorithms to perform
-    do_permutation = false
-    do_hybrid = false
+    do_permutation = true
+    do_hybrid = true
     do_selfish = true
 
 
@@ -162,9 +163,9 @@ function benchmark_test()
         i2 = i2 + 1
 
         problem = generate_problem(b[1], b[2], b[3], b[4], b[5])
+        lb = lower_bound(problem)
         
-        printf("|    %2i%2i | %2i x%2i | %11i |", b[1], i2, b[1], b[2], 
-                                                  lower_bound(problem))
+        printf("|    %2i%2i | %2i x%2i | %11i |", b[1], i2, b[1], b[2], lb)
 
         #1) Permutation Genetic:
         makespans = zeros(Int64, num_runs,1) 
@@ -180,7 +181,7 @@ function benchmark_test()
                 makespans[j] = compute_makespan(optimal_schedule)
             end
             if do_plot
-                plot_convergence(perm_conv, "output/perm_$(b[1])_$(i2)", 1024, 1024)
+                plot_convergence(perm_conv, "output/perm_$(b[1])_$(i2)", lb, 1024, 1024)
             end
         end
 
@@ -202,7 +203,7 @@ function benchmark_test()
                 makespans[j] = compute_makespan(optimal_schedule)
             end
             if do_plot
-                plot_convergence(hyb_conv, "output/hyb_$(b[1])_$(i2)", 1024, 1024)
+                plot_convergence(hyb_conv, "output/hyb_$(b[1])_$(i2)", lb, 1024, 1024)
             end
         end
         printf(" %4i | %6.1f |", min(makespans), mean(makespans))
@@ -225,7 +226,7 @@ function benchmark_test()
             end
             #println(sg_conv)
             if do_plot
-                plot_convergence(sg_conv, "output/slf_$(b[1])_$(i2)", 1024, 1024)
+                plot_convergence(sg_conv, "output/slf_$(b[1])_$(i2)", lb, 1024, 1024)
             end
         end
         printf(" %5i | %6.1f |\n", min(makespans), mean(makespans))
