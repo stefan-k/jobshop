@@ -26,7 +26,8 @@
 %% aktive Referenzen
 \usepackage{hyperref}
 
-\usepackage{ngerman}			% language set to new-german
+%\usepackage{ngerman}			% language set to new-german
+\usepackage[english]{babel}
 \usepackage[utf8]{inputenc} 	% coding of german special characters
 % \usepackage{ae,aecompl}
 % \usepackage{amsmath,amssymb,amstext} 	% support for mathematics
@@ -110,132 +111,203 @@
 
 
 \begin{frame}
-  \frametitle{Inhalt}
+  \frametitle{Content}
         \tableofcontents[hideallsubsections %
                         % ,pausesections
                         ] % erzeugt Inhaltsverzeichnis
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Beispiele}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Aufzählungen}
+\section{Introduction}
+\subsection{nix}
 \begin{frame}
-	\frametitle{Aufzählungen erstellen}
-	\begin{spacing}{1.5}
-	\begin{itemize}
-		\item Punkt 1
-		\begin{itemize}
-			\item Unterpunkt 1
-			\item Unterpunkt 2
-		\end{itemize}
-		\item Punkt 2
-		\item Punkt 3
-	\end{itemize}
-	\end{spacing}
+  \frametitle{Motivation}
 \end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Blöcke}
-\begin{frame}
-	\frametitle{Blöcke}
-	\framesubtitle{Normale Blöcke}
-	\begin{block}{Normaler Block}
-		Das ist ein Block mit einer Formel
-		\begin{eqnarray*}
-		u(x,t) & = & \sum_{k=1}^{\infty} f_k \sin \frac{k \pi x}{L} \cos 
-					 \frac{k \pi t}{aL} + \\
-			   & + & \sum_{k=1}^{\infty} g_k \sin \frac{k \pi x}{L} \sin 
-					 \frac{k \pi t}{aL} \\
-		\end{eqnarray*}
-	\end{block}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}[fragile]
-	\frametitle{Blöcke}
-	\framesubtitle{Beispiel-Blöcke}
-	\begin{exampleblock}{Beispiel-Block}
-	\begin{semiverbatim}
-SUCHE (A,x)
-1: i = 0
-2: WHILE i<n
-3:     i = i+1
-4:     \alert{IF A[i]=x THEN RETURN i}
-5: ELSE RETURN -1
-	\end{semiverbatim}
-	\end{exampleblock}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-	\frametitle{Blöcke}
-	\framesubtitle{Alert-Blöcke}
-	\Large
-	\begin{alertblock}{Alert-Block}
-		\centering
-		Achtung! Nicht zu viel Inhalt auf eine Folie!
-	\end{alertblock}
+  \frametitle{Language}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Spalten und Grafiken}
+\section{evolib}
+\subsection{nix}
 \begin{frame}
-	\frametitle{Spalten und Grafiken}
-	\begin{columns}
-		\begin{column}{0.5\textwidth}
-			Aufzählung in Spalte 1
-			\begin{enumerate}
-				\item Punkt 1
-				\item Punkt 2
-				\item Punkt 3
-			\end{enumerate}
-		\end{column}
-		\begin{column}{0.5\textwidth}
-			\begin{center}
-			%\includegraphics[width=0.4\textwidth]{smail}
-
-			Grafik in Spalte 2
-			\end{center}
-		\end{column}
-	\end{columns}
+  \frametitle{evolib - A Julia Library}
 \end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Abschnitt 2}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Abschnitt 3}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Zusammenfassung}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-	\frametitle{Zusammenfassung}
-	\begin{itemize}
-		\item Punkt 1
-		\item Punkt 2
-		\item Punkt 3
-	\end{itemize}
+  \frametitle{Algorithms}
 \end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{} % Damit die Kontakt-Folie nicht im Inhaltsverzeichnis aufscheint
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Kontakt}
-nothing
+  \frametitle{Example}
 \end{frame}
+
+\section{Open Job Shop Problem}
+\subsection{Introduction}
+\begin{frame}
+  \frametitle{Problem definition}
+\end{frame}
+
+\subsection{Algorithms}
+\begin{frame}
+  \frametitle{Permutation Genetic Algorithm}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Hybrid Genetic Algorithm}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Selfish Gene Algorithm}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Other approaches}
+\end{frame}
+
+\section{Evaluation}
+\subsection{nix}
+\begin{frame}
+  \frametitle{Evaluation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Random Number Generator}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Convergence}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Comparison}
+\end{frame}
+
+\section{Conclusion}
+\subsection{nix}
+\begin{frame}
+  \frametitle{Conclusion}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Beispiele}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\subsection{Aufzählungen}
+%\begin{frame}
+	%\frametitle{Aufzählungen erstellen}
+	%\begin{spacing}{1.5}
+	%\begin{itemize}
+		%\item Punkt 1
+		%\begin{itemize}
+			%\item Unterpunkt 1
+			%\item Unterpunkt 2
+		%\end{itemize}
+		%\item Punkt 2
+		%\item Punkt 3
+	%\end{itemize}
+	%\end{spacing}
+%\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\subsection{Blöcke}
+%\begin{frame}
+	%\frametitle{Blöcke}
+	%\framesubtitle{Normale Blöcke}
+	%\begin{block}{Normaler Block}
+		%Das ist ein Block mit einer Formel
+		%\begin{eqnarray*}
+		%u(x,t) & = & \sum_{k=1}^{\infty} f_k \sin \frac{k \pi x}{L} \cos 
+					 %\frac{k \pi t}{aL} + \\
+				 %& + & \sum_{k=1}^{\infty} g_k \sin \frac{k \pi x}{L} \sin 
+					 %\frac{k \pi t}{aL} \\
+		%\end{eqnarray*}
+	%\end{block}
+%\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{frame}[fragile]
+	%\frametitle{Blöcke}
+	%\framesubtitle{Beispiel-Blöcke}
+	%\begin{exampleblock}{Beispiel-Block}
+	%\begin{semiverbatim}
+%SUCHE (A,x)
+%1: i = 0
+%2: WHILE i<n
+%3:     i = i+1
+%4:     \alert{IF A[i]=x THEN RETURN i}
+%5: ELSE RETURN -1
+	%\end{semiverbatim}
+	%\end{exampleblock}
+%\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{frame}
+	%\frametitle{Blöcke}
+	%\framesubtitle{Alert-Blöcke}
+	%\Large
+	%\begin{alertblock}{Alert-Block}
+		%\centering
+		%Achtung! Nicht zu viel Inhalt auf eine Folie!
+	%\end{alertblock}
+%\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\subsection{Spalten und Grafiken}
+%\begin{frame}
+	%\frametitle{Spalten und Grafiken}
+	%\begin{columns}
+		%\begin{column}{0.5\textwidth}
+			%Aufzählung in Spalte 1
+			%\begin{enumerate}
+				%\item Punkt 1
+				%\item Punkt 2
+				%\item Punkt 3
+			%\end{enumerate}
+		%\end{column}
+		%\begin{column}{0.5\textwidth}
+			%\begin{center}
+			%%\includegraphics[width=0.4\textwidth]{smail}
+
+			%Grafik in Spalte 2
+			%\end{center}
+		%\end{column}
+	%\end{columns}
+%\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Abschnitt 2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Abschnitt 3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Zusammenfassung}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{frame}
+	%\frametitle{Zusammenfassung}
+	%\begin{itemize}
+		%\item Punkt 1
+		%\item Punkt 2
+		%\item Punkt 3
+	%\end{itemize}
+%\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section*{} % Damit die Kontakt-Folie nicht im Inhaltsverzeichnis aufscheint
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{frame}
+%\frametitle{Kontakt}
+%nothing
+%\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
