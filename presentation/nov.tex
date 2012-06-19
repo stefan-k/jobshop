@@ -121,16 +121,46 @@
 \subsection{nix}
 \begin{frame}
   \frametitle{Motivation}
+  \begin{itemize}
+    \item Implementation of an evolutionary optimization framework in Julia
+    \item Generalized design to solve a wide range of problems
+    \item Make it easy to build algorithms on top of the framework
+    \item Evaluation of the framework with an interesting problem (Open Job Shop)
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Language}
+  \frametitle{The Julia Language}
+  \begin{itemize}
+    \item high-level, high-performance dynamic programming language for technical computing
+    \item Syntax similar to \textsc{Matlab} and Python
+    \item just in time (JIT) compilation (using LLVM)
+    \item aggressive optimization
+    \item optional typing
+    \item multiple dispatch
+    \item Lisp-like macro system
+    \item often C-like performance
+    \item easy distributed and parallel computing
+  \end{itemize}
 \end{frame}
 
 \section{evolib}
 \subsection{nix}
 \begin{frame}
   \frametitle{evolib - A Julia Library}
+  \begin{itemize}
+    \item Makes heavy use of multiple dispatch
+    \item Defines types \texttt{Gene}, \texttt{BitGene}, \texttt{Chromosome}, \texttt{Population} and \texttt{Generation}
+    \item Basic genetic and evolutionary algorithms based on these types
+    \item Lots of convenience functions:
+      \begin{itemize}
+        \item Constructors for each type
+        \item Generate random instances of types
+        \item Indexing and modifiers
+        \item Roulette Wheel Selection
+        \item Mutation, Crossover
+      \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
