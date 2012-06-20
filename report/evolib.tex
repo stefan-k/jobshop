@@ -1,1 +1,121 @@
 \section{evolib}\label{evolib}
+
+Die \textit{evolib} Bibliothek wurde so ausgelegt, dass wann immer möglich und sinnvoll, die multiple dispatch Funktionalität von Julia genutzt wurde.
+
+Als Grundstruktur werden sogenannte Types (vergleichbar mit C \texttt{struct}s) definiert, und zwar für \texttt{Gene}, \texttt{Chromosome}, \texttt{Population} und \texttt{Generation}. 
+Diese Types bauen aufeinander auf, beispielsweise besteht ein \texttt{Chromosome} aus mehreren \texttt{Gene}s. 
+Zusätzlich enthalten die jeweiligen Types aber auch weitere Metainformationen, wie zum Beispiel die \texttt{fitness} bei einem \texttt{Chromosome}.
+
+Auf Basis dieser Types wird multiple dispatch durchgeführt.
+
+\subsection{\texttt{Gene} Datentyp}
+
+Ein \texttt{Gene} wird mit dem folgenden Datentyp repräsentiert. 
+Das \texttt{gene} Feld ist vom Typ \texttt{Number}, also ein abstrakter Übertyp über alle Typen die Zahlen repräsentieren. 
+Mit \texttt{std} wird die Standardabweichung definiert, welche für die Mutation eines Gens herangezogen wird.
+Sollte eine Beschränkung des \texttt{gene} Feldes gewünscht sein, können \texttt{upper\_limit} und \texttt{lower\_limit} definiert werden. 
+Diese Grenzen werden bei der Mutation eines Genes berücksichtigt. Werden diese auf \texttt{NaN} gesetzt, so wird \texttt{gene} nicht limitiert.
+\begin{Verbatim}
+type Gene <: AbstractGene
+    gene::Number
+    std::Float64
+    upper_limit::Float64
+    lower_limit::Float64
+
+    # Constructors
+    function Gene(gene::Number) 
+        new(gene, 0.5, NaN, NaN) # ignore limits
+    end
+                                            
+    function Gene(gene::Number, std::Float64) 
+        new(gene, std, NaN, NaN) # ignore limits
+    end
+                                                            
+    function Gene(gene::Number, std::Float64, upper_limit::Float64, 
+                  lower_limit::Float64)
+        if lower_limit >= upper_limit
+            error("lower_limit must be less than upper_limit")
+        end
+        new(gene, std, upper_limit, lower_limit)
+    end
+end
+\end{Verbatim}
+
+Die Konstruktoren ermöglichen das Generieren einer Instanz des \texttt{Gene} Typs, wobei sinnvolle Defaultwerte gewählt werden wenn Parameter nicht angegeben werden.
+
+\subsection{\texttt{Chromosome} Datentyp}
+
+Eine Instanz des \texttt{Chromosome} Datentyps enthält einen Vektor mit \texttt{Gene}s, sowie die Länge des Vektors und die Fitness des \texttt{Chromosome}s. 
+Wieder ist dank multiple dispatch möglich mehrere Konstruktoren für den Datentyp zu definieren.  
+Wird keine Fitness beim Erstellen einer Instanz angegeben, so wird diese auf \texttt{Inf} gesetzt.
+
+\begin{Verbatim}
+type Chromosome <: AbstractChromosome
+    genes::Vector
+    length::Int64
+    fitness::Float64
+
+    # Constructors
+    function Chromosome(genes::Vector) 
+        new(map(copy, genes), length(genes), Inf)
+    end
+
+    function Chromosome(genes::Vector, fitness::Float64)
+        new(copy(genes), length(genes), copy(fitness))
+    end
+
+    function Chromosome()
+        new(Gene[], 0, Inf)
+    end
+end
+\end{Verbatim}
+
+\subsection{\texttt{Population} Datentyp}
+Der \texttt{Population} Datentyp hält einen Vektor von \texttt{Chromosome}s und die Länge dieses Vektors in \texttt{pop\_size}.
+\begin{Verbatim}
+type Population <: AbstractPopulation
+    chromosomes::Vector
+    pop_size::Int64
+
+    # Constructors
+    # several chromosomes passed
+    function Population(chromosomes::Vector) 
+        new(chromosomes, length(chromosomes))
+    end
+
+    # one chromosome passed
+    function Population(chromosome::Chromosome) 
+        new([chromosome], 1)
+    end
+
+    # empty Population
+    function Population()
+        new(Chromosome[], 0)
+    end
+                                                                          
+    function Population(size::Int)
+        new(Array(Chromosome, size), size)
+    end
+end
+\end{Verbatim}
+
+\subsection{\texttt{Generations} Datentyp}
+Mit \texttt{Generations} ist es möglich mehrere Generationen in einer Datenstruktur zu repräsentieren. 
+\begin{Verbatim}
+type Generations <: AbstractGenerations
+    populations::Array
+    generations::Int64
+
+    # Constructors
+    function Generations(population::Population)
+        new([copy(population)], 1)
+    end
+
+    function Generations()
+        new(Population[], 0)
+    end
+end
+\end{Verbatim}
+
+\subsection{Funktionalität}
+\subsection{Definieren einer Qualitätsfunktion}
