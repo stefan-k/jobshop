@@ -68,7 +68,8 @@ end
 #
 function makespan_objective_function(problem::OpenJobShopProblem, population::Population)
     for i = 1:length(population)
-        makespan_objective_function(problem, population.chromosomes[i])
+        #makespan_objective_function(problem, population.chromosomes[i])
+        makespan_objective_function(problem, population[i])
     end
 end
 
