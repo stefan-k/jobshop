@@ -117,5 +117,52 @@ type Generations <: AbstractGenerations
 end
 \end{Verbatim}
 
+\subsection{\texttt{GeneticProbabilities} Datentyp}
+Dieser Datentyp erleichtert das Definieren der Wahrscheinlichkeiten für die Operationen \textit{Mutation}, \textit{Recombination}, \textit{Reproduction} und \textit{Immigration} für den genetischen Algorithmus.
+
+\begin{Verbatim}
+type GeneticProbabilities <: AbstractGeneticProbabilities
+    mutation::Float64
+    recombination::Float64
+    reproduction::Float64
+    immigration::Float64
+
+    function GeneticProbabilities(mutation::Float64, 
+                                  recombination::Float64,
+                                  reproduction::Float64,
+                                  immigration::Float64)
+        sum = mutation + recombination + reproduction + immigration
+        new(mutation/sum, recombination/sum, reproduction/sum, immigration/sum)
+    end
+end
+\end{Verbatim}
+
 \subsection{Funktionalität}
+
+\textit{evolib} bietet viele Funktionen die dafür sorgen, dass die Verwendung der Datentypen einfach und ``natürlich'' möglich ist. 
+Beispielsweise ist es möglich über Array-Indexing mit $\left[\mathrm{i}\right]$ das $i$te Gen eines Chromosoms anzusprechen und zu modifizieren.
+Mit \texttt{rand(::Type\{T\}, x\ldots)} ist es möglich einen Datentyp \texttt{T} zufällig zu initialisieren, wobei \texttt{T} für \texttt{Population}, \texttt{Chromosome} oder \texttt{Gene} stehen kann.
+
+Weiters kann mit \texttt{sort()} und \texttt{sort!()} (in-place) eine Population anhand der Fitness der Chromosomen sortiert werden.
+
+Algorithmen wie \texttt{roulette()}, \texttt{mutate()} und \texttt{crossover()} sind ebenfalls implementiert. 
+Bei den letzten beiden gibt es die Varianten \texttt{mutate!()} und \texttt{crossover!()} die die Operationen in-place vornehmen um die Operationen im Speicher zu minimieren. 
+\texttt{crossover()} bietet auch die Möglichkeit die Anzahl der Schnitte vorzugeben.
+
 \subsection{Definieren einer Qualitätsfunktion}
+Die evolutionären Algorithmen erfordern eine Qualitätsfunktion die vom Benutzer der Bibliothek definiert werden muss. 
+Es ist dabei wichtig dass diese Funktion nur einen Parameter hat, da diese Funktion intern mit einem Parameter aufgerufen wird.
+Dabei bietet es sich an die Qualitätsfunktion zwei mal zu definieren, einmal für den Fall dass eine \texttt{Population} übergeben wird, und einmal für \texttt{Chromosome}. 
+
+Sollte es nötig sein der Qualitätsfunktion weitere Parameter zu übergeben, so können \texttt{lambdas} genützt werden um eine anonyme Funktion zu erzeugen die diese Eigenschaft erfüllt:
+
+\begin{Verbatim}
+objective_function = 
+    (x::Union(Population, Chromosome))->real_objective_function(x, another_parameter)
+\end{Verbatim}
+
+Hierbei ist zu beachten, dass \texttt{another\_parameter} aus dem Scope kommt, in dem das \texttt{lambda} definiert wurde.
+
+\subsection{Evolutionäre Algorithmen}
+\textit{evolib} enthält den genetischen Algorithmus und die evolutionären Algorithmen vom Typ (1+1) und $(\mu/\rho, \lambda)$.
+Auf eine genaue Ausführung der implementierten evolutionären Algorithmen wird hier verzichtet, da diese anhand den Blockdiagrammen im Skriptum der Lehrveranstaltung implementiert wurden. 
