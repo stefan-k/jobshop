@@ -1,1 +1,35 @@
 \section{Einleitung}\label{einleitung}
+
+Dieses Projekt befasst sich mit der Entwicklung einer Bibliothek für evolutionäre Algorithmen (\textit{evolib}) in der Programmiersprache Julia. 
+Ziel ist es ein einfaches Framework zu schaffen das es ermöglicht darauf aufbauend mit wenig Aufwand evolutionäre Algorithmen zu entwickeln. 
+Ausserdem sollen grundlegende Algorithmen, wie in den Vorlesungsunterlagen beschrieben, implementiert werden.
+Die Implementierung des Frameworks wird anhand des Open Job Shop Problems, wie beschrieben in [?], evaluiert. 
+
+\subsection{Julia}
+Julia ist eine junge Programmiersprache im Entwicklungsstadium, die zwar viele Möglichkeiten bietet, allerdings noch keine Routinen zur stochastischen Optimierung enthält.
+
+Es ist eine dynamische, high-level und high-performance Programmiersprache für Technical Computing, ähnlich wie \textsc{Matlab}. Die Syntax ähnelt ebenfalls \textsc{Matlab}, sowie auch der von Python. 
+Die Einflüsse reichen weiter von Perl, Ruby, über Lua bis zu Lisp.
+
+Der Vorteil gegenüber \textsc{Matlab} für Technical Computing ist, dass der gesamte Code just in time (JIT) kompiliert wird. 
+Dazu wird die LLVM-Compilertoolchain verwendet.
+
+Das Ziel der Sprache ist, high-level zu sein, aber trotzdem Performance im Bereich von statisch typisierten Sprachen wie C zu erreichen. 
+Julia macht es möglich, den Typ einer Variable anzugeben, es ist aber nicht zwingendermaßen notwendig.
+Wird keine Typinformation angegeben, so optimiert der Compiler auf alle Typen, bzw. ermittelt die wahrscheinlichsten Typen durch type inference.
+Die Typinformation ist also eine Hilfestellung für den Compiler, der dadurch seine Arbeit minimieren kann. 
+Weiters kann die Typinformation genutzt werden um Typfehlern vorzubeugen.
+
+Diese Eigenschaften von Julia sind essentiell für ein Programmierkonzept, das Julia stark von vielen anderen Sprachen abgrenzt: multiple dispatch.
+Mit multiple dispatch ist es möglich die Funktionsauswahl anhand aller dynamischen Typen vorzunehmen anstatt nur anhand des Typs von einem Objekt, wie es in vielen anderen objektorientierten Programmiersprachen üblich ist. 
+Die Auswahl der passenden Funktion geschieht während der Laufzeit. 
+Das ähnliche Überladen von Funktionen (Polymorphismus) anderer Sprachen trifft diese Entscheidung bereits zur Übersetzungszeit.
+
+Multiple dispatch ermöglicht es Funktionsnamen wiederzuverwenden, wobei je nach übergebenen Parametern der passende Code ausgeführt wird. 
+Das führt zu leichter les- und wartbarem Code. 
+
+Weiters bietet Julia Möglichkeiten zur Metaprogrammierung mit Lisp-ähnlichen Makros. Das bedeutet, es ist möglich Code zu schreiben der Code generiert.
+
+Julia legt ausserdem Wert darauf, Cluster und Multicore-Architekturen zu unterstützten. 
+
+Wie bei den Benchmarks auf der Website [?] ersichtlich, wird oft eine Performance in der Nähe von C erreicht.
