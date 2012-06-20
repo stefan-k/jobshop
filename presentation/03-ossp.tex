@@ -1,7 +1,13 @@
 \section{Open Job Shop Problem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \begin{frame}
-  \frametitle{Problem definition}
+  \frametitle{Open Job Shop Scheduling Problem}
 
   \begin{itemize}
     \item $m$ \textbf{jobs} have to processed by $n$ \textbf{machines}
@@ -14,6 +20,8 @@
  	
 
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
 	\frametitle{Example}
@@ -34,7 +42,47 @@ Valid schedule for a 3x3-problem (3 jobs, 3 machines)
 	
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+	\frametitle{$NP$-hardness}
+	
+	\begin{itemize}
+	
+		\item Similar to normal Job Shop and Flow Shop problems, but with a larger solution space \textrightarrow harder to find optimal solution.
+
+		\item 	The Open Job Shop Scheduling Problem is known to be $NP$-hard for $n \geq 3$ (the Partitioning Problem can be reduced to it).
+
+		\item 	\textrightarrow Research focusses on \textbf{heuristics} since exact approaches are not feasible.
+	\end{itemize}
+	
+	
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+	\frametitle{Known Approaches}
+	\begin{itemize}
+	
+		\item Branch and Bound (1997)
+
+		\item 	Tabu Search (1999)
+
+		\item 	\textbf{Evolutionary bases heuristics} (1999)
+
+		\item 	Particle Swarm Optimization (2008)
+	\end{itemize}
+	
+	
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Algorithms}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}
   \frametitle{Permutation Genetic Algorithm\cite{Khuri}}
 	
@@ -57,6 +105,8 @@ Valid schedule for a 3x3-problem (3 jobs, 3 machines)
 	What does it mean to \emph{schedule} an operation?  
 
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
   \frametitle{Scheduling step}
@@ -83,20 +133,23 @@ Simple scheduling: Append operation to machine, after previous operations of the
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}
-  \frametitle{Implementation details}
-\begin{itemize}
+    \frametitle{Implementation details}
+    \begin{itemize}
 
-	\item A chromosome consists of $m\cdot~n$ genes, each gene representing an operation.
+    	\item A chromosome consists of $m\cdot~n$ genes, each gene representing an operation.
 
-	\item Start with random genes
+    	\item Start with random genes
 
-	\item Genetic algorithm adapts genes freely as floats \textrightarrow the order of the genes decides the permutation, e.g.
+    	\item Genetic algorithm adapts genes freely as floats \textrightarrow the order of the genes decides the permutation, e.g.
 
-	\item a chromosome $(64.4, 33.5, 64.5)$ represents the permutation $(2,1,3)$
-\end{itemize}
-
+    	\item a chromosome $(64.4, 33.5, 64.5)$ represents the permutation $(2,1,3)$
+    \end{itemize}
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
   \frametitle{Hybrid Genetic Algorithm}
@@ -106,23 +159,104 @@ Simple scheduling: Append operation to machine, after previous operations of the
 
 	\item  	permutes jobs instead of operations
 
-	\item 	Keep a list of unfinished jobs, plus a list of unfinished operations for each of these jobs.
-
-	\item 	All indices are modulo!
+	\item 	Called \textbf{hybrid}, because it keeps a sorted list of unfinished operations for each job \textrightarrow schedules long operations first
+	
 \end{itemize}
+
+
  
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-  \frametitle{Why is it called hybrid?}
-\begin{itemize}
+  \frametitle{Hybrid Genetic - Example}
 
-	\item 	The lists of operations are sorted by duration \textrightarrow longest jobs are scheduled first!
-
-	\item  	Performs well on big problems
-\end{itemize}
+	
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=1]{images/hyb0.png}
+	\caption{caption}
+	\label{fig:label}
+\end{figure}
+	
  
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+  \frametitle{Hybrid Genetic - Example}
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=1]{images/hyb1.png}
+	\caption{caption}
+	\label{fig:label}
+\end{figure}
+	
+ 
+\end{frame}
+\begin{frame}
+  \frametitle{Hybrid Genetic - Example}
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=1]{images/hyb0.png}
+	\caption{The table represents the problem definition, the sequence ``1 3 2 4'' directs the scheduling order}
+	\label{fig:label}
+\end{figure}
+	
+ 
+\end{frame}
+\begin{frame}
+  \frametitle{Hybrid Genetic - Example (1)}
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=1]{images/hyb1.png}
+	\caption{First, schedule the longest operation of job 1 (left column)}
+	\label{fig:label}
+\end{figure}
+	
+ 
+\end{frame}
+\begin{frame}
+  \frametitle{Hybrid Genetic - Example (2)}
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=1]{images/hyb2.png}
+	\caption{The index 3 also points to job 1 (modulo). Schedule the second longest operation.}
+	\label{fig:label}
+\end{figure}
+	
+ 
+\end{frame}
+\begin{frame}
+  \frametitle{Hybrid Genetic - Example (3)}
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=1]{images/hyb3.png}
+	\caption{Now, any index would refer to job 2, because it's the only unfinished job. Schedule the longest operation.}
+	\label{fig:label}
+\end{figure}
+	
+ 
+\end{frame}
+\begin{frame}
+  \frametitle{Hybrid Genetic - Example (4)}
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[scale=1]{images/hyb4.png}
+	\caption{Finish scheduling.}
+	\label{fig:label}
+\end{figure}
+	
+ 
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
   \frametitle{Selfish Gene Algorithm}
@@ -142,6 +276,7 @@ Simple scheduling: Append operation to machine, after previous operations of the
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[fragile]
 \vspace{-0.8cm}
@@ -167,6 +302,8 @@ SELFISH_GENE():
 \end{verbatim}}
 
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
   \frametitle{Other approaches}
