@@ -49,11 +49,11 @@ Valid schedule for a 3x3-problem (3 jobs, 3 machines)
 	
 	\begin{itemize}
 	
-		\item Similar to normal Job Shop and Flow Shop problems, but with a larger solution space \textrightarrow harder to find optimal solution.
+		\item Similar to normal Job Shop and Flow Shop problems, but with a larger solution space \textrightarrow \hspace{.5em} harder to find optimal solution.
 
 		\item 	The Open Job Shop Scheduling Problem is known to be $NP$-hard for $n \geq 3$ (the Partitioning Problem can be reduced to it).
 
-		\item 	\textrightarrow Research focusses on \textbf{heuristics} since exact approaches are not feasible.
+		\item 	\textrightarrow \hspace{.5em} Research focusses on \textbf{heuristics} since exact approaches are not feasible.
 	\end{itemize}
 	
 	
@@ -69,7 +69,7 @@ Valid schedule for a 3x3-problem (3 jobs, 3 machines)
 
 		\item 	Tabu Search (1999)
 
-		\item 	\textbf{Evolutionary bases heuristics} (1999)
+		\item 	\textbf{Evolutionary based heuristics} (1999)
 
 		\item 	Particle Swarm Optimization (2008)
 	\end{itemize}
@@ -121,7 +121,7 @@ Simple scheduling: Append operation to machine, after previous operations of the
 
 \column{.5\linewidth}
 	\begin{figure}
-		\includegraphics[width=.6\linewidth]{images/scheduling.png}
+		\includegraphics[width=.8\linewidth]{images/scheduling.png}
 
 	\end{figure}
 	
@@ -143,7 +143,7 @@ Simple scheduling: Append operation to machine, after previous operations of the
 
     	\item Start with random genes
 
-    	\item Genetic algorithm adapts genes freely as floats \textrightarrow the order of the genes decides the permutation, e.g.
+    	\item Genetic algorithm adapts genes freely as floats \textrightarrow \hspace{.5em} the order of the genes decides the permutation, e.g.
 
     	\item a chromosome $(64.4, 33.5, 64.5)$ represents the permutation $(2,1,3)$
     \end{itemize}
@@ -159,7 +159,7 @@ Simple scheduling: Append operation to machine, after previous operations of the
 
 	\item  	permutes jobs instead of operations
 
-	\item 	Called \textbf{hybrid}, because it keeps a sorted list of unfinished operations for each job \textrightarrow schedules long operations first
+	\item 	Called \textbf{hybrid}, because it keeps a sorted list of unfinished operations for each job \textrightarrow \hspace{.5em} schedules long operations first
 	
 \end{itemize}
 
@@ -167,41 +167,16 @@ Simple scheduling: Append operation to machine, after previous operations of the
  
 \end{frame}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}
-  \frametitle{Hybrid Genetic - Example}
-
-	
-\begin{figure}[htbp]
-	\centering
-		\includegraphics[scale=1]{images/hyb0.png}
-	\caption{caption}
-	\label{fig:label}
-\end{figure}
-	
- 
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-  \frametitle{Hybrid Genetic - Example}
-
-\begin{figure}[htbp]
-	\centering
-		\includegraphics[scale=1]{images/hyb1.png}
-	\caption{caption}
-	\label{fig:label}
-\end{figure}
-	
- 
-\end{frame}
 \begin{frame}
   \frametitle{Hybrid Genetic - Example}
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[scale=1]{images/hyb0.png}
-	\caption{The table represents the problem definition, the sequence ``1 3 2 4'' directs the scheduling order}
+	\caption{The table represents the problem definition, the sequence ``1 3 2 4'' directs the scheduling order.}
 	\label{fig:label}
 \end{figure}
 	
@@ -213,7 +188,7 @@ Simple scheduling: Append operation to machine, after previous operations of the
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[scale=1]{images/hyb1.png}
-	\caption{First, schedule the longest operation of job 1 (left column)}
+	\caption{First, schedule the longest operation of job 1 (left column).}
 	\label{fig:label}
 \end{figure}
 	
@@ -263,15 +238,18 @@ Simple scheduling: Append operation to machine, after previous operations of the
 
 \begin{itemize}
 
-	\item Third approach from \cite{Khuri}%, does \textbf{not} use the evolib!
+	\item Uses a \textbf{virtual population} (VP)%, does \textbf{not} use the evolib!
 
-	\item [ Builds a virtual population ] instead of storing chromosomes, store probabilities of gene values.
+	\begin{itemize}
+		\item instead of storing chromosomes, store probabilities of gene values.
 
-	\item According to these probabilities, some genes are more likely to occur than others when an individual is picked.
+		\item Indivuals are drawn from the VP according to these probabilities.
 
-	\item Two individuals are chosen and their fitness (makespan) compared. The genes of the winner are rewarded by increasing their probability.
+		\item Better fitness means higher probability for genes (a competition is held).
 	
-	\item A \textbf{steady state} is reached when each gene acquires one value with a probability $\geq 95\%$
+		\item \textbf{steady state}: Every gene acquires a certain value with  $P \geq 95\%$.
+	\end{itemize}
+	\item In our case: genes represent job/machine indices.
 \end{itemize}
 
 \end{frame}
@@ -279,6 +257,8 @@ Simple scheduling: Append operation to machine, after previous operations of the
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[fragile]
+	\frametitle{Selfish Gene Algorithm - Pseudocode}
+	
 \vspace{-0.8cm}
 {\scriptsize
 \begin{verbatim}
@@ -304,7 +284,3 @@ SELFISH_GENE():
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-  \frametitle{Other approaches}
-\end{frame}
