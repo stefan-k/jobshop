@@ -269,7 +269,8 @@ rand(T::Type{Chromosome}, num::Int64, x...) = Chromosome([rand(Gene, x...) for i
 
 function rand(T::Type{Chromosome}, num::Int64, obj_func::Function, x...) 
     chr = rand(T, num, x...)
-    chr.fitness = obj_func(chr)
+    #chr.fitness = obj_func(chr)
+    chr = obj_func(chr)
     return chr
 end
 

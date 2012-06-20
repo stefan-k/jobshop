@@ -4,18 +4,22 @@
 
 load("evolib.jl")
 
-# define the objective function (in-place!)
-function rosenbrock(chr::Chromosome)
-    x1 = chr[1].gene
-    x2 = chr[2].gene
-    chr.fitness = 100*(x2-x1^2)^2+(1-x1)^2-50*((x1+1)^2+(x2-1)^2)-10*((x1-1.5)^2+(x2-2.5)^2)+exp(2*x2-5)
-end
+srand(123)
 
 # in case someone wants to calculate the objective function for a population
 function rosenbrock(pop::Population)
     for i=1:length(pop)
         rosenbrock(pop[i])
     end
+    #pop = Population(pmap((x)->rosenbrock(x), pop.chromosomes))
+end
+
+# define the objective function (in-place!)
+function rosenbrock(chr::Chromosome)
+    x1 = chr[1].gene
+    x2 = chr[2].gene
+    chr.fitness = 100*(x2-x1^2)^2+(1-x1)^2-50*((x1+1)^2+(x2-1)^2)-10*((x1-1.5)^2+(x2-2.5)^2)+exp(2*x2-5)
+    chr
 end
 
 # randomly initialize a population with 100 chromosomes

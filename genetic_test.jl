@@ -9,6 +9,7 @@ function rosenbrock(chr::Chromosome)
     x1 = chr[1].gene
     x2 = chr[2].gene
     chr.fitness = 100*(x2-x1^2)^2+(1-x1)^2-50*((x1+1)^2+(x2-1)^2)-10*((x1-1.5)^2+(x2-2.5)^2)+exp(2*x2-5)
+    return chr
 end
 
 # in case someone wants to calculate the objective function for a population
@@ -26,4 +27,6 @@ probs = GeneticProbabilities(0.2, 0.499, 0.3, 0.001)
 popul = rand(Population, 100, 2, rosenbrock, 0.1, 6.0, -6.0 )
 
 # launch genetic algorithm
-@time genetic(popul, probs, 1000, rosenbrock)
+@time best, conve = genetic(popul, probs, 1000, rosenbrock)
+print(best)
+println()
