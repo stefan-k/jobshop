@@ -58,6 +58,7 @@
 \usepackage{array}
 \usepackage{setspace}
 \usepackage{textcomp}
+\usepackage{subfigure}
 
 %\usepackage[thinspace,thinqspace,squaren,textstyle]{SIunits}
 
@@ -94,8 +95,8 @@
 
 
 %% Titelblatt-Einstellungen
-\title{Implementation of an Evolutionary Optimization Framework and Application to the Open Job Shop Problem}
-%\subtitle{}
+\title{Implementation of an Evolutionary Optimization Framework}
+\subtitle{and Application to the Open Job Shop Problem}
 \author{Joris Bayer, Stefan Kroboth}
 % \date{}		% wenn ein anderes als das heutige Datum eingesetzt werden soll
 
@@ -139,12 +140,12 @@
   \frametitle{The Julia Language}
   \begin{itemize}
     \item high-level, high-performance dynamic programming language for technical computing
-    \item Syntax similar to \textsc{Matlab} and Python
+    %\item Syntax similar to \textsc{Matlab} and Python
     \item just in time (JIT) compilation (using LLVM)
-    \item aggressive optimization
+    %\item aggressive optimization
     \item optional typing
     \item multiple dispatch
-    \item Lisp-like macro system
+    %\item Lisp-like macro system
     \item often C-like performance
     \item easy distributed and parallel computing
   \end{itemize}
@@ -156,16 +157,17 @@
   \frametitle{evolib - A Julia Library}
   \begin{itemize}
     \item Makes heavy use of multiple dispatch
-    \item Defines types \texttt{Gene}, \texttt{BitGene}, \texttt{Chromosome}, \texttt{Population} and \texttt{Generation}
-    \item Basic genetic and evolutionary algorithms based on these types
-    \item Lots of convenience functions:
-      \begin{itemize}
+    \item Defines types \texttt{Gene}, \texttt{Chromosome}, \texttt{Population} and \texttt{Generation}
+    %\item Types are exchangeable due to Type hierarchy
+    \item Lots of convenience functions
+      %\begin{itemize}
         %\item Constructors for each type
         %\item Generate random instances of types
-        \item Indexing and modifiers
-        \item Roulette Wheel Selection
-        \item Mutation, Crossover
-      \end{itemize}
+        %\item Indexing and modifiers
+        %\item Roulette Wheel Selection
+        %\item Mutation, Crossover
+      %\end{itemize}
+    \item Basic genetic and evolutionary algorithms based on these types
   \end{itemize}
 \end{frame}
 
@@ -184,35 +186,33 @@
   \end{spacing}
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Example}
-  %\begin{exampleblock}{Beispiel-Block}
-  \vspace{-0.5cm}
-{\scriptsize
-\begin{verbatim}
-load("evolib.jl")
+%\begin{frame}[fragile]
+  %\frametitle{Example}
+  %\vspace{-0.5cm}
+%{\scriptsize
+%\begin{verbatim}
+%load("evolib.jl")
 
-function rosenbrock(chr::Chromosome)
-    x1 = chr[1].gene
-    x2 = chr[2].gene
-    chr.fitness = 100*(x2-x1^2)^2+(1-x1)^2-50*((x1+1)^2+(x2-1)^2)
-                 -10*((x1-1.5)^2+(x2-2.5)^2)+exp(2*x2-5)
-end
+%function rosenbrock(chr::Chromosome)
+    %x1 = chr[1].gene
+    %x2 = chr[2].gene
+    %chr.fitness = 100*(x2-x1^2)^2+(1-x1)^2-50*((x1+1)^2+(x2-1)^2)
+                 %-10*((x1-1.5)^2+(x2-2.5)^2)+exp(2*x2-5)
+%end
 
-function rosenbrock(pop::Population)
-    for i=1:length(pop)
-        rosenbrock(pop[i])
-    end
-end
+%function rosenbrock(pop::Population)
+    %for i=1:length(pop)
+        %rosenbrock(pop[i])
+    %end
+%end
 
-popul = rand(Population, 100, 2, rosenbrock, 1.0, 6.0, -6.0 )
+%popul = rand(Population, 100, 2, rosenbrock, 1.0, 6.0, -6.0 )
 
-@time best = evo_slash(popul, 2, 150, 1000, 0.85, 0.0000001, rosenbrock)
-print(best)
+%@time best = evo_slash(popul, 2, 150, 1000, 0.85, 0.0000001, rosenbrock)
+%print(best)
 
-\end{verbatim}}
-  %\end{exampleblock}
-\end{frame}
+%\end{verbatim}}
+%\end{frame}
 
 \input{03-ossp.tex}
 
