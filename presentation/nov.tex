@@ -95,8 +95,9 @@
 
 
 %% Titelblatt-Einstellungen
-\title{Implementation of an Evolutionary Optimization Framework}
-\subtitle{and Application to the Open Job Shop Problem}
+\title{Implementation of an Evolutionary Optimization Framework \\%}
+%\subtitle{
+and Application to the Open Job Shop Problem}
 \author{Joris Bayer, Stefan Kroboth}
 % \date{}		% wenn ein anderes als das heutige Datum eingesetzt werden soll
 
@@ -117,12 +118,12 @@
 
 
 
-\begin{frame}
-  \frametitle{Content}
-        \tableofcontents[hideallsubsections %
-                        % ,pausesections
-                        ] % erzeugt Inhaltsverzeichnis
-\end{frame}
+% \begin{frame}
+%   \frametitle{Content}
+%         %\tableofcontents[hideallsubsections %
+%                         % ,pausesections
+%         %                ] % erzeugt Inhaltsverzeichnis
+% \end{frame}
 
 \section{Introduction}
 \subsection{nix}
@@ -135,6 +136,20 @@
     \item Evaluation of the framework with an interesting problem (Open Job Shop)
   \end{itemize}
 \end{frame}
+
+
+\begin{frame}
+	
+	\frametitle{Evolutionary Basics}
+%	\vspace{-1cm}
+	\begin{figure}[htbp]
+		\centering
+			\includegraphics[scale=.6]{images/evo-basics.pdf}
+%		\caption{caption}
+		\label{fig:label}
+	\end{figure}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{The Julia Language}
@@ -186,33 +201,33 @@
   \end{spacing}
 \end{frame}
 
-%\begin{frame}[fragile]
-  %\frametitle{Example}
-  %\vspace{-0.5cm}
-%{\scriptsize
-%\begin{verbatim}
-%load("evolib.jl")
+\begin{frame}[fragile]
+  \frametitle{Example}
+  \vspace{-0.5cm}
+{\scriptsize
+\begin{verbatim}
+load("evolib.jl")
 
-%function rosenbrock(chr::Chromosome)
-    %x1 = chr[1].gene
-    %x2 = chr[2].gene
-    %chr.fitness = 100*(x2-x1^2)^2+(1-x1)^2-50*((x1+1)^2+(x2-1)^2)
-                 %-10*((x1-1.5)^2+(x2-2.5)^2)+exp(2*x2-5)
-%end
+function rosenbrock(chr::Chromosome)
+    x1 = chr[1].gene
+    x2 = chr[2].gene
+    chr.fitness = 100*(x2-x1^2)^2+(1-x1)^2-50*((x1+1)^2+(x2-1)^2)
+                 -10*((x1-1.5)^2+(x2-2.5)^2)+exp(2*x2-5)
+end
 
-%function rosenbrock(pop::Population)
-    %for i=1:length(pop)
-        %rosenbrock(pop[i])
-    %end
-%end
+function rosenbrock(pop::Population)
+    for i=1:length(pop)
+        rosenbrock(pop[i])
+    end
+end
 
-%popul = rand(Population, 100, 2, rosenbrock, 1.0, 6.0, -6.0 )
+popul = rand(Population, 100, 2, rosenbrock, 1.0, 6.0, -6.0 )
 
-%@time best = evo_slash(popul, 2, 150, 1000, 0.85, 0.0000001, rosenbrock)
-%print(best)
+@time best = evo_slash(popul, 2, 150, 1000, 0.85, 0.0000001, rosenbrock)
+print(best)
 
-%\end{verbatim}}
-%\end{frame}
+\end{verbatim}}
+\end{frame}
 
 \input{03-ossp.tex}
 
@@ -224,6 +239,26 @@
 \subsection{nix}
 \begin{frame}
   \frametitle{Conclusion}
+
+  We
+
+ \begin{itemize}
+ 
+ 	\item[\checkmark]  Implemented a general evolutionary library, capable of solving a wide range of problems,
+
+ 	\item[\checkmark]   thereby improving our understanding of the algorithms, 
+
+ 	\item[\checkmark]   applied it successfully to a well-known optimization problem,
+
+ 	\item[\checkmark]   got results comparable to earlier scientific research.
+ \end{itemize}
+ 
+
+%Possible Room for improvement: different crossover/mutation functions, computational efficiency, longer test runs
+
+
+
+
 \end{frame}
 
 \begin{frame}

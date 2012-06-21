@@ -145,7 +145,7 @@ function selfish_gene(problem::OpenJobShopProblem, reward_step, stop, max_iter)
             best_sofar = winner
         end
 
-        convergence[i] = fitness(winner)
+        convergence[i] = fitness(best_sofar)
 
     end #loop
 
